@@ -2,6 +2,8 @@
 
 ### Allows to obtain compliance information out of a blank note string.
 
+The package create an instance of InstanceDB to store all the Tornado deposits and withdrawal events
+that are queried, which is why it is not currently compatible with node environments.
 
 How to:
 

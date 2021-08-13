@@ -7,7 +7,7 @@ import ITornadoEventsDB, {
 import { StoreNames } from 'idb';
 import { TornadoEvents } from './index';
 import IndexedDB from './IndexedDB';
-import { AvailableNetworks, CurrencyAmountPair } from '../types';
+import { AvailableNetworks, CurrencyAmountArray, CurrencyAmountPair } from '../types';
 
 export type EventsUpdateType =
   | {
@@ -306,8 +306,5 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
 
     return this.putBulkValues(instance, events);
   }
-}
-function CurrencyAmountArray(CurrencyAmountArray: any) {
-  throw new Error('Function not implemented.');
 }
 

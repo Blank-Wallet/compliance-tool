@@ -104,4 +104,11 @@ export declare enum AvailableNetworks {
 export declare const Networks: {
     [chainId: number]: string;
 };
+declare type CurrencyAmountArrayType = {
+    [ccy in KnownCurrencies]: CurrencyAmountType[ccy][];
+};
+/**
+ * CurrencyAmountArray
+ */
+export declare const CurrencyAmountArray: CurrencyAmountArrayType;
 export {};

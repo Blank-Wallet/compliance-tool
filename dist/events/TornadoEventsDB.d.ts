@@ -99,13 +99,7 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
     getDepositEventByCommitment(network: AvailableNetworks, pair: CurrencyAmountPair, commitment: string): Promise<{
         leafIndex: number;
         commitment: string;
-        timestamp: string; /**
-         * getWithdrawalTableName
-         *
-         * @param network The current network
-         * @param param1 The destructured currency/amount pair
-         * @returns The string formatted withdrawal store specified instance
-         */
+        timestamp: string;
         transactionHash: string;
         blockNumber: number;
     } | undefined>;
@@ -119,13 +113,7 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
     getAllDepositsByLeafIndex(network: AvailableNetworks, pair: CurrencyAmountPair, lastLeafIndex?: number): Promise<{
         leafIndex: number;
         commitment: string;
-        timestamp: string; /**
-         * getWithdrawalTableName
-         *
-         * @param network The current network
-         * @param param1 The destructured currency/amount pair
-         * @returns The string formatted withdrawal store specified instance
-         */
+        timestamp: string;
         transactionHash: string;
         blockNumber: number;
     }[]>;
@@ -140,13 +128,7 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
     getAllEvents(eventType: TornadoEvents, network: AvailableNetworks, pair: CurrencyAmountPair): Promise<({
         leafIndex: number;
         commitment: string;
-        timestamp: string; /**
-         * getWithdrawalTableName
-         *
-         * @param network The current network
-         * @param param1 The destructured currency/amount pair
-         * @returns The string formatted withdrawal store specified instance
-         */
+        timestamp: string;
         transactionHash: string;
         blockNumber: number;
     } | {

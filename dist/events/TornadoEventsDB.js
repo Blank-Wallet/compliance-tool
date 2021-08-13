@@ -306,7 +306,7 @@ var TornadoEventsDB = /** @class */ (function (_super) {
                             });
                         });
                     };
-                    for (var _c = 0, _d = Object.entries(CurrencyAmountArray); _c < _d.length; _c++) {
+                    for (var _c = 0, _d = Object.entries(types_1.CurrencyAmountArray); _c < _d.length; _c++) {
                         var _e = _d[_c], currency = _e[0], amount = _e[1];
                         _loop_2(currency, amount);
                     }
@@ -348,6 +348,3 @@ var TornadoEventsDB = /** @class */ (function (_super) {
     return TornadoEventsDB;
 }(IndexedDB_1.default));
 exports.TornadoEventsDB = TornadoEventsDB;
-function CurrencyAmountArray(CurrencyAmountArray) {
-    throw new Error('Function not implemented.');
-}

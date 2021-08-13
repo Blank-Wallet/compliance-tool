@@ -50,3 +50,22 @@ export const Networks: {[chainId: number]: string} = {
     1: 'mainnet',
     5: 'goerli'
 }
+
+type CurrencyAmountArrayType = {
+    [ccy in KnownCurrencies]: CurrencyAmountType[ccy][];
+  };
+  /**
+   * CurrencyAmountArray
+   */
+  export const CurrencyAmountArray: CurrencyAmountArrayType = Object.keys(
+    instances,
+  ).reduce((pv, cv) => {
+    const currency = cv as KnownCurrencies;
+    if (Object.values(KnownCurrencies).includes(currency)) {
+      pv[currency] = Object.keys(
+        instances[currency].instanceAddress,
+      ).sort() as any[];
+    }
+    return pv;
+  }, {} as CurrencyAmountArrayType);
+  
