@@ -108,9 +108,12 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!events_1.isInitialized()) {
-                    events_1.initTornadoEventsDB();
-                }
+                if (!!events_1.isInitialized()) return [3 /*break*/, 2];
+                return [4 /*yield*/, events_1.initTornadoEventsDB()];
+            case 1:
+                _a.sent();
+                _a.label = 2;
+            case 2:
                 depositComplianceInfo = {
                     deposit: {},
                     withdrawal: {},
@@ -131,7 +134,7 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                 }
                 network = types_1.Networks[chainId];
                 return [4 /*yield*/, parseDeposit(note)];
-            case 1:
+            case 3:
                 parsedDeposit = _a.sent();
                 networkKey = "netId" + chainId;
                 deployments = config_1.default.deployments;
@@ -139,16 +142,16 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                 contract = new ethers_1.Contract(contractAddress, Mixer_abi_json_1.default, getProvider(network));
                 // Update deposit events
                 return [4 /*yield*/, events_1.updateTornadoEvents(events_1.TornadoEvents.DEPOSIT, pair, network, getProvider(network), contract.contract)];
-            case 2:
+            case 4:
                 // Update deposit events
                 _a.sent();
                 // Update withdrawal events
                 return [4 /*yield*/, events_1.updateTornadoEvents(events_1.TornadoEvents.WITHDRAWAL, pair, network, getProvider(network), contract.contract)];
-            case 3:
+            case 5:
                 // Update withdrawal events
                 _a.sent();
                 return [4 /*yield*/, events_1.getTornadoEventsDb().getDepositEventByCommitment(network, pair, parsedDeposit.commitmentHex)];
-            case 4:
+            case 6:
                 depEv = _a.sent();
                 if (!depEv) {
                     throw new Error('Deposit not found on events');
@@ -156,11 +159,11 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                 return [4 /*yield*/, events_1.getTornadoEventsDb().isSpent(network, pair, parsedDeposit.nullifierHex)
                     // Get transaction receipt
                 ];
-            case 5:
+            case 7:
                 spent = _a.sent();
                 return [4 /*yield*/, getProvider(network)
                         .getTransactionReceipt(depEv.transactionHash)];
-            case 6:
+            case 8:
                 receipt = _a.sent();
                 depositComplianceInfo.deposit = {
                     pair: pair,
@@ -174,7 +177,7 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                     return [2 /*return*/, depositComplianceInfo];
                 }
                 return [4 /*yield*/, events_1.getTornadoEventsDb().getWithdrawalEventByNullifier(network, pair, parsedDeposit.nullifierHex)];
-            case 7:
+            case 9:
                 withdrawEv = _a.sent();
                 if (!withdrawEv) {
                     // Deposit has not been withdrawn yet
@@ -182,7 +185,7 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                 }
                 return [4 /*yield*/, getProvider(network)
                         .getBlock(withdrawEv.blockNumber)];
-            case 8:
+            case 10:
                 timestamp = (_a.sent()).timestamp;
                 depositComplianceInfo.withdrawal = {
                     pair: pair,

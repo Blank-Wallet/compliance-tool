@@ -68,7 +68,7 @@ export const isValidNoteString = (noteString: string) => {
     if (!match || !match.groups) {
       return false
     }
-    
+
     return true
 }
 
@@ -76,7 +76,7 @@ export const getComplianceInformation = async (
     noteString: string
 ): Promise<ComplianceInfo> => {
     if(!isInitialized()) {
-        initTornadoEventsDB()
+        await initTornadoEventsDB()
     }
 
     const depositComplianceInfo = {
