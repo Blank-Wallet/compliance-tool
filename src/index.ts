@@ -115,7 +115,7 @@ export const getComplianceInformation = async (
       pair,
       network as AvailableNetworks,
       getProvider(network as AvailableNetworks),
-      contract.contract,
+      contract,
     );
 
     // Update withdrawal events
@@ -124,7 +124,7 @@ export const getComplianceInformation = async (
         pair,
         network as AvailableNetworks,
         getProvider(network as AvailableNetworks),
-        contract.contract,
+        contract,
     );
 
     const depEv = await getTornadoEventsDb()!.getDepositEventByCommitment(

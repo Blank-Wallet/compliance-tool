@@ -141,12 +141,12 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                 contractAddress = deployments[networkKey][pair.currency].instanceAddress[pair.amount];
                 contract = new ethers_1.Contract(contractAddress, Mixer_abi_json_1.default, getProvider(network));
                 // Update deposit events
-                return [4 /*yield*/, events_1.updateTornadoEvents(events_1.TornadoEvents.DEPOSIT, pair, network, getProvider(network), contract.contract)];
+                return [4 /*yield*/, events_1.updateTornadoEvents(events_1.TornadoEvents.DEPOSIT, pair, network, getProvider(network), contract)];
             case 4:
                 // Update deposit events
                 _a.sent();
                 // Update withdrawal events
-                return [4 /*yield*/, events_1.updateTornadoEvents(events_1.TornadoEvents.WITHDRAWAL, pair, network, getProvider(network), contract.contract)];
+                return [4 /*yield*/, events_1.updateTornadoEvents(events_1.TornadoEvents.WITHDRAWAL, pair, network, getProvider(network), contract)];
             case 5:
                 // Update withdrawal events
                 _a.sent();
