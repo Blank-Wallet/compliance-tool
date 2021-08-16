@@ -15,6 +15,7 @@ const providers: {[network in AvailableNetworks]: ethers.providers.JsonRpcProvid
 
 const getProvider = (network: AvailableNetworks) => {
     if(providers[network] === undefined) {
+        // TODO: Add provider urls
         providers[network] = new ethers.providers.JsonRpcProvider()
     }
 
