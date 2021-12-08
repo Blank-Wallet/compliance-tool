@@ -54,8 +54,7 @@ var providers = {
 };
 var getProvider = function (network) {
     if (providers[network] === undefined) {
-        // TODO: Add provider urls
-        providers[network] = new ethers_1.ethers.providers.JsonRpcProvider();
+        providers[network] = new ethers_1.ethers.providers.JsonRpcProvider(types_1.Endpoints[network]);
     }
     return providers[network];
 };

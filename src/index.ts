@@ -3,6 +3,7 @@ import { babyJub, pedersenHash } from "circomlib";
 import {
   AvailableNetworks,
   ComplianceInfo,
+  Endpoints,
   KnownCurrencies,
   Networks,
 } from "./types";
@@ -28,8 +29,9 @@ const providers: {
 
 const getProvider = (network: AvailableNetworks) => {
   if (providers[network] === undefined) {
-    // TODO: Add provider urls
-    providers[network] = new ethers.providers.JsonRpcProvider();
+    providers[network] = new ethers.providers.JsonRpcProvider(
+      Endpoints[network]
+    );
   }
 
   return providers[network]!;

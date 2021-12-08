@@ -25,8 +25,8 @@ exports.Networks = {
     5: "goerli",
 };
 exports.Endpoints = {
-    1: 'https://mainnet-node.goblank.io',
-    5: 'https://goerli-node.goblank.io'
+    'mainnet': 'https://mainnet-node.goblank.io',
+    'goerli': 'https://goerli-node.goblank.io'
 };
 /**
  * CurrencyAmountArray

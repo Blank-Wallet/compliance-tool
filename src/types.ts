@@ -51,9 +51,9 @@ export const Networks: { [chainId: number]: string } = {
   5: "goerli",
 };
 
-export const Endpoints: { [chainId: number]: string } = {
-  1: 'https://mainnet-node.goblank.io',
-  5: 'https://goerli-node.goblank.io'
+export const Endpoints: { [name in AvailableNetworks]: string } = {
+  'mainnet': 'https://mainnet-node.goblank.io',
+  'goerli': 'https://goerli-node.goblank.io'
 }
 
 type CurrencyAmountArrayType = {

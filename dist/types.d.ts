@@ -29,11 +29,12 @@ declare const instances: {
         };
         tokenAddress: string;
         symbol: string;
-        decimals: number; /**
-         * CurrencyAmountArray
-         */
+        decimals: number;
     };
     usdc: {
+        /**
+         * CurrencyAmountArray
+         */
         instanceAddress: {
             "100": string;
             "1000": string;
@@ -108,7 +109,7 @@ export declare const Networks: {
     [chainId: number]: string;
 };
 export declare const Endpoints: {
-    [chainId: number]: string;
+    [name in AvailableNetworks]: string;
 };
 declare type CurrencyAmountArrayType = {
     [ccy in KnownCurrencies]: CurrencyAmountType[ccy][];
