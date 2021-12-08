@@ -16,6 +16,7 @@ export type CurrencyAmountPair = {
 };
 
 export type ComplianceInfo = {
+  chainId: number;
   deposit: {
     pair: CurrencyAmountPair;
     spent: boolean;

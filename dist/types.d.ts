@@ -32,9 +32,6 @@ declare const instances: {
         decimals: number;
     };
     usdc: {
-        /**
-         * CurrencyAmountArray
-         */
         instanceAddress: {
             "100": string;
             "1000": string;
@@ -78,6 +75,7 @@ export declare type CurrencyAmountPair = {
     amount: string;
 };
 export declare type ComplianceInfo = {
+    chainId: number;
     deposit: {
         pair: CurrencyAmountPair;
         spent: boolean;

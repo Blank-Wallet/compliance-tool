@@ -104,7 +104,7 @@ var isValidNoteString = function (noteString) {
 };
 exports.isValidNoteString = isValidNoteString;
 var getComplianceInformation = function (noteString) { return __awaiter(void 0, void 0, void 0, function () {
-    var depositComplianceInfo, noteRegex, match, pair, note, chainId, network, parsedDeposit, networkKey, deployments, contractAddress, contract, depEv, spent, receipt, withdrawEv, timestamp;
+    var noteRegex, match, chainId, depositComplianceInfo, pair, note, network, parsedDeposit, networkKey, deployments, contractAddress, contract, depEv, spent, receipt, withdrawEv, timestamp;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -114,24 +114,25 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                 _a.sent();
                 _a.label = 2;
             case 2:
-                depositComplianceInfo = {
-                    deposit: {},
-                    withdrawal: {},
-                };
                 noteRegex = /tornado-(?<currency>\w+)-(?<amount>[\d.]+)-(?<chainId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g;
                 match = noteRegex.exec(noteString);
                 if (!match || !match.groups) {
                     throw new Error("The note has invalid format");
                 }
+                chainId = parseInt(match.groups.chainId);
+                if (!(chainId in types_1.Networks)) {
+                    throw new Error("This note is from an invalid network");
+                }
+                depositComplianceInfo = {
+                    deposit: {},
+                    withdrawal: {},
+                    chainId: chainId
+                };
                 pair = {
                     currency: match.groups.currency,
                     amount: match.groups.amount,
                 };
                 note = match.groups.note;
-                chainId = parseInt(match.groups.chainId);
-                if (!(chainId in types_1.Networks)) {
-                    throw new Error("This note is from an invalid network");
-                }
                 network = types_1.Networks[chainId];
                 return [4 /*yield*/, parseDeposit(note)];
             case 3:

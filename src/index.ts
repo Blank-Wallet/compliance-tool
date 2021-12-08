@@ -96,17 +96,23 @@ export const getComplianceInformation = async (
     await initTornadoEventsDB();
   }
 
-  const depositComplianceInfo = {
-    deposit: {},
-    withdrawal: {},
-  } as ComplianceInfo;
-
   const noteRegex =
-    /tornado-(?<currency>\w+)-(?<amount>[\d.]+)-(?<chainId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g;
+  /tornado-(?<currency>\w+)-(?<amount>[\d.]+)-(?<chainId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g;
   const match = noteRegex.exec(noteString);
   if (!match || !match.groups) {
     throw new Error("The note has invalid format");
   }
+  
+  const chainId = parseInt(match.groups.chainId);
+  if (!(chainId in Networks)) {
+    throw new Error("This note is from an invalid network");
+  }
+
+  const depositComplianceInfo = {
+    deposit: {},
+    withdrawal: {},
+    chainId
+  } as ComplianceInfo;
 
   const pair = {
     currency: match.groups.currency as KnownCurrencies,
@@ -114,10 +120,7 @@ export const getComplianceInformation = async (
   };
 
   const note = match.groups.note;
-  const chainId = parseInt(match.groups.chainId);
-  if (!(chainId in Networks)) {
-    throw new Error("This note is from an invalid network");
-  }
+  
   const network = Networks[chainId];
   const parsedDeposit = await parseDeposit(note);
 
