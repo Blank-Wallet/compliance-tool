@@ -1,13 +1,13 @@
-import ITornadoEventsDB, { DepositsEventsDbKey, WithdrawalsEventsDbKey } from './ITornadoEventsDB';
-import { TornadoEvents } from './index';
-import IndexedDB from './IndexedDB';
-import { AvailableNetworks, CurrencyAmountPair } from '../types';
+import IndexedDB from "./IndexedDB";
+import ITornadoEventsDB, { Deposit, DepositsEventsDbKey, Withdrawal } from "./ITornadoEventsDB";
+import { AvailableNetworks, CurrencyAmountPair } from "../types";
+import { TornadoEvents } from "./index";
 export declare type EventsUpdateType = {
     type: TornadoEvents.DEPOSIT;
-    events: ITornadoEventsDB[DepositsEventsDbKey]['value'][];
+    events: Deposit[];
 } | {
     type: TornadoEvents.WITHDRAWAL;
-    events: ITornadoEventsDB[WithdrawalsEventsDbKey]['value'][];
+    events: Withdrawal[];
 };
 export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
     /**
@@ -17,7 +17,7 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
      * @param param1 The destructured currency/amount pair
      * @returns The string formatted deposits store specified instance
      */
-    getDepositTableName(network: AvailableNetworks, { currency, amount }: CurrencyAmountPair): "deposits-mainnet-eth-0.1" | "deposits-mainnet-eth-1" | "deposits-mainnet-eth-10" | "deposits-mainnet-eth-100" | "deposits-mainnet-dai-100" | "deposits-mainnet-dai-1000" | "deposits-mainnet-dai-10000" | "deposits-mainnet-dai-100000" | "deposits-mainnet-cdai-5000" | "deposits-mainnet-cdai-50000" | "deposits-mainnet-cdai-500000" | "deposits-mainnet-cdai-5000000" | "deposits-mainnet-usdt-100" | "deposits-mainnet-usdt-1000" | "deposits-mainnet-usdc-100" | "deposits-mainnet-usdc-1000" | "deposits-mainnet-wbtc-0.1" | "deposits-mainnet-wbtc-1" | "deposits-mainnet-wbtc-10" | "deposits-goerli-eth-0.1" | "deposits-goerli-eth-1" | "deposits-goerli-eth-10" | "deposits-goerli-eth-100" | "deposits-goerli-dai-100" | "deposits-goerli-dai-1000" | "deposits-goerli-dai-10000" | "deposits-goerli-dai-100000" | "deposits-goerli-cdai-5000" | "deposits-goerli-cdai-50000" | "deposits-goerli-cdai-500000" | "deposits-goerli-cdai-5000000" | "deposits-goerli-usdt-100" | "deposits-goerli-usdt-1000" | "deposits-goerli-usdc-100" | "deposits-goerli-usdc-1000" | "deposits-goerli-wbtc-0.1" | "deposits-goerli-wbtc-1" | "deposits-goerli-wbtc-10";
+    getDepositTableName(network: AvailableNetworks, { currency, amount }: CurrencyAmountPair): DepositsEventsDbKey;
     /**
      * getWithdrawalTableName
      *
@@ -52,6 +52,7 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
      * @returns The specified instance last leaf index
      */
     getLastLeafIndex(network: AvailableNetworks, pair: CurrencyAmountPair): Promise<number>;
+    getLastEventIndex(eventType: TornadoEvents, network: AvailableNetworks, pair: CurrencyAmountPair): Promise<number>;
     /**
      * updateLastQueriedBlock
      *
@@ -80,13 +81,7 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
      *
      * @returns The nullifier withdrawal event
      */
-    getWithdrawalEventByNullifier(network: AvailableNetworks, pair: CurrencyAmountPair, nullifier: string): Promise<{
-        to: string;
-        fee: import("ethers").BigNumber;
-        transactionHash: string;
-        blockNumber: number;
-        nullifierHex: string;
-    } | undefined>;
+    getWithdrawalEventByNullifier(network: AvailableNetworks, pair: CurrencyAmountPair, nullifier: string): Promise<Withdrawal | undefined>;
     /**
      * getDepositEventByCommitment
      *
@@ -96,13 +91,7 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
      *
      * @returns The commitment deposit event
      */
-    getDepositEventByCommitment(network: AvailableNetworks, pair: CurrencyAmountPair, commitment: string): Promise<{
-        leafIndex: number;
-        commitment: string;
-        timestamp: string;
-        transactionHash: string;
-        blockNumber: number;
-    } | undefined>;
+    getDepositEventByCommitment(network: AvailableNetworks, pair: CurrencyAmountPair, commitment: string): Promise<Deposit | undefined>;
     /**
      * getAllDepositsByLeafIndex
      *
@@ -110,13 +99,7 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
      * @param pair The currency/amount pair
      * @returns All the deposits events ordered by leafIndex
      */
-    getAllDepositsByLeafIndex(network: AvailableNetworks, pair: CurrencyAmountPair, lastLeafIndex?: number): Promise<{
-        leafIndex: number;
-        commitment: string;
-        timestamp: string;
-        transactionHash: string;
-        blockNumber: number;
-    }[]>;
+    getAllDepositsByLeafIndex(network: AvailableNetworks, pair: CurrencyAmountPair, lastLeafIndex?: number): Promise<Deposit[]>;
     /**
      * getAllEvents
      *
@@ -125,19 +108,7 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
      * @param pair The currency/amount pair
      * @returns All the specified instance Tornado events
      */
-    getAllEvents(eventType: TornadoEvents, network: AvailableNetworks, pair: CurrencyAmountPair): Promise<({
-        leafIndex: number;
-        commitment: string;
-        timestamp: string;
-        transactionHash: string;
-        blockNumber: number;
-    } | {
-        to: string;
-        fee: import("ethers").BigNumber;
-        transactionHash: string;
-        blockNumber: number;
-        nullifierHex: string;
-    } | {
+    getAllEvents(eventType: TornadoEvents, network: AvailableNetworks, pair: CurrencyAmountPair): Promise<(Deposit | Withdrawal | {
         instance: string;
         lastQueriedBlock: number;
     })[]>;
@@ -157,4 +128,14 @@ export declare class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
      * @param param2 The type/events object
      */
     updateEvents(network: AvailableNetworks, pair: CurrencyAmountPair, { type, events }: EventsUpdateType): Promise<void>;
+    /**
+     * truncateEvents
+     *
+     * It deletes all the events for the specified instance
+     *
+     * @param network The current network
+     * @param pair The currency/amount pair
+     * @param param2 The type/events object
+     */
+    truncateEvents(network: AvailableNetworks, pair: CurrencyAmountPair, { type }: EventsUpdateType): Promise<void>;
 }

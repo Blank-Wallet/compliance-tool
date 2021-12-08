@@ -1,20 +1,20 @@
 declare const instances: {
     eth: {
         instanceAddress: {
-            '0.1': string;
-            '1': string;
-            '10': string;
-            '100': string;
+            "0.1": string;
+            "1": string;
+            "10": string;
+            "100": string;
         };
         symbol: string;
         decimals: number;
     };
     dai: {
         instanceAddress: {
-            '100': string;
-            '1000': string;
-            '10000': string;
-            '100000': string;
+            "100": string;
+            "1000": string;
+            "10000": string;
+            "100000": string;
         };
         tokenAddress: string;
         symbol: string;
@@ -22,19 +22,21 @@ declare const instances: {
     };
     cdai: {
         instanceAddress: {
-            '5000': string;
-            '50000': string;
-            '500000': string;
-            '5000000': string;
+            "5000": string;
+            "50000": string;
+            "500000": string;
+            "5000000": string;
         };
         tokenAddress: string;
         symbol: string;
-        decimals: number;
+        decimals: number; /**
+         * CurrencyAmountArray
+         */
     };
     usdc: {
         instanceAddress: {
-            '100': string;
-            '1000': string;
+            "100": string;
+            "1000": string;
         };
         tokenAddress: string;
         symbol: string;
@@ -42,8 +44,8 @@ declare const instances: {
     };
     usdt: {
         instanceAddress: {
-            '100': string;
-            '1000': string;
+            "100": string;
+            "1000": string;
         };
         tokenAddress: string;
         symbol: string;
@@ -51,15 +53,16 @@ declare const instances: {
     };
     wbtc: {
         instanceAddress: {
-            '0.1': string;
-            '1': string;
-            '10': string;
+            "0.1": string;
+            "1": string;
+            "10": string;
         };
         tokenAddress: string;
         symbol: string;
         decimals: number;
     };
     proxy: string;
+    defaultProxy: string;
 };
 export declare enum KnownCurrencies {
     ETH = "eth",
@@ -95,13 +98,16 @@ export declare type ComplianceInfo = {
  * Defines a type that types the currency with the available amount types
  */
 export declare type CurrencyAmountType = {
-    [key in KnownCurrencies]: keyof typeof instances[key]['instanceAddress'];
+    [key in KnownCurrencies]: keyof typeof instances[key]["instanceAddress"];
 };
 export declare enum AvailableNetworks {
     MAINNET = "mainnet",
     GOERLI = "goerli"
 }
 export declare const Networks: {
+    [chainId: number]: string;
+};
+export declare const Endpoints: {
     [chainId: number]: string;
 };
 declare type CurrencyAmountArrayType = {

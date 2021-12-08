@@ -66,9 +66,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TornadoEventsDB = void 0;
-var index_1 = require("./index");
+/* eslint-disable @typescript-eslint/no-explicit-any */
 var IndexedDB_1 = __importDefault(require("./IndexedDB"));
 var types_1 = require("../types");
+var index_1 = require("./index");
 var TornadoEventsDB = /** @class */ (function (_super) {
     __extends(TornadoEventsDB, _super);
     function TornadoEventsDB() {
@@ -83,7 +84,7 @@ var TornadoEventsDB = /** @class */ (function (_super) {
      */
     TornadoEventsDB.prototype.getDepositTableName = function (network, _a) {
         var currency = _a.currency, amount = _a.amount;
-        return "deposits-" + network + "-" + currency + "-" + amount;
+        return "deposits-".concat(network, "-").concat(currency, "-").concat(amount);
     };
     /**
      * getWithdrawalTableName
@@ -94,7 +95,7 @@ var TornadoEventsDB = /** @class */ (function (_super) {
      */
     TornadoEventsDB.prototype.getWithdrawalTableName = function (network, _a) {
         var currency = _a.currency, amount = _a.amount;
-        return "withdrawals-" + network + "-" + currency + "-" + amount;
+        return "withdrawals-".concat(network, "-").concat(currency, "-").concat(amount);
     };
     /**
      * getStoreInstance
@@ -124,12 +125,12 @@ var TornadoEventsDB = /** @class */ (function (_super) {
                 switch (_a.label) {
                     case 0:
                         instance = this.getStoreInstanceName(eventType, network, pair);
-                        return [4 /*yield*/, this.getValue('lastEvents', instance)];
+                        return [4 /*yield*/, this.getValue("lastEvents", instance)];
                     case 1:
                         value = (_a.sent());
                         if (!!value) return [3 /*break*/, 3];
                         value = { instance: instance, lastQueriedBlock: 0 };
-                        return [4 /*yield*/, this.putValue('lastEvents', value)];
+                        return [4 /*yield*/, this.putValue("lastEvents", value)];
                     case 2:
                         _a.sent();
                         _a.label = 3;
@@ -164,6 +165,15 @@ var TornadoEventsDB = /** @class */ (function (_super) {
             });
         });
     };
+    TornadoEventsDB.prototype.getLastEventIndex = function (eventType, network, pair) {
+        return __awaiter(this, void 0, void 0, function () {
+            var instance;
+            return __generator(this, function (_a) {
+                instance = this.getStoreInstanceName(eventType, network, pair);
+                return [2 /*return*/, this.countAllValues(instance)];
+            });
+        });
+    };
     /**
      * updateLastQueriedBlock
      *
@@ -176,15 +186,11 @@ var TornadoEventsDB = /** @class */ (function (_super) {
         return __awaiter(this, void 0, void 0, function () {
             var instance;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        instance = this.getStoreInstanceName(eventType, network, pair);
-                        return [4 /*yield*/, this.putValue('lastEvents', {
-                                instance: instance,
-                                lastQueriedBlock: lastQueriedBlock,
-                            })];
-                    case 1: return [2 /*return*/, _a.sent()];
-                }
+                instance = this.getStoreInstanceName(eventType, network, pair);
+                return [2 /*return*/, this.putValue("lastEvents", {
+                        instance: instance,
+                        lastQueriedBlock: lastQueriedBlock,
+                    })];
             });
         });
     };
@@ -242,7 +248,7 @@ var TornadoEventsDB = /** @class */ (function (_super) {
             var instance;
             return __generator(this, function (_a) {
                 instance = this.getDepositTableName(network, pair);
-                return [2 /*return*/, this.getValueFromIndex(instance, 'commitment', commitment)];
+                return [2 /*return*/, this.getValueFromIndex(instance, "commitment", commitment)];
             });
         });
     };
@@ -258,7 +264,7 @@ var TornadoEventsDB = /** @class */ (function (_super) {
             var instance;
             return __generator(this, function (_a) {
                 instance = this.getDepositTableName(network, pair);
-                return [2 /*return*/, this.getAllFromIndex(instance, 'leafIndex', lastLeafIndex ? IDBKeyRange.lowerBound(lastLeafIndex + 1) : undefined)];
+                return [2 /*return*/, this.getAllFromIndex(instance, "leafIndex", lastLeafIndex ? IDBKeyRange.lowerBound(lastLeafIndex + 1) : undefined)];
             });
         });
     };
@@ -270,6 +276,8 @@ var TornadoEventsDB = /** @class */ (function (_super) {
      * @param pair The currency/amount pair
      * @returns All the specified instance Tornado events
      */
+    // Complex type
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     TornadoEventsDB.prototype.getAllEvents = function (eventType, network, pair) {
         return __awaiter(this, void 0, void 0, function () {
             var instance;
@@ -292,17 +300,17 @@ var TornadoEventsDB = /** @class */ (function (_super) {
                 _loop_1 = function (network) {
                     var _loop_2 = function (currency, amount) {
                         amount.forEach(function (v) {
-                            var depositName = "deposits-" + network + "-" + currency + "-" + v;
-                            var withdrawalName = "withdrawals-" + network + "-" + currency + "-" + v;
+                            var depositName = "deposits-".concat(network, "-").concat(currency, "-").concat(v);
+                            var withdrawalName = "withdrawals-".concat(network, "-").concat(currency, "-").concat(v);
                             tables.push({
                                 name: depositName,
-                                keyPath: 'leafIndex',
-                                indexes: ['leafIndex', 'commitment'],
+                                keyPath: "leafIndex",
+                                indexes: ["leafIndex", "commitment"],
                             });
                             tables.push({
                                 name: withdrawalName,
-                                keyPath: 'nullifierHex',
-                                indexes: ['nullifierHex'],
+                                keyPath: "nullifierHex",
+                                indexes: ["nullifierHex"],
                             });
                         });
                     };
@@ -318,9 +326,9 @@ var TornadoEventsDB = /** @class */ (function (_super) {
                 }
                 // Create LastEvents table
                 tables.push({
-                    name: 'lastEvents',
-                    keyPath: 'instance',
-                    indexes: ['instance'],
+                    name: "lastEvents",
+                    keyPath: "instance",
+                    indexes: ["instance"],
                 });
                 return [2 /*return*/, this.createObjectStore(tables)];
             });
@@ -342,6 +350,25 @@ var TornadoEventsDB = /** @class */ (function (_super) {
             return __generator(this, function (_b) {
                 instance = this.getStoreInstanceName(type, network, pair);
                 return [2 /*return*/, this.putBulkValues(instance, events)];
+            });
+        });
+    };
+    /**
+     * truncateEvents
+     *
+     * It deletes all the events for the specified instance
+     *
+     * @param network The current network
+     * @param pair The currency/amount pair
+     * @param param2 The type/events object
+     */
+    TornadoEventsDB.prototype.truncateEvents = function (network, pair, _a) {
+        var type = _a.type;
+        return __awaiter(this, void 0, void 0, function () {
+            var instance;
+            return __generator(this, function (_b) {
+                instance = this.getStoreInstanceName(type, network, pair);
+                return [2 /*return*/, this.truncateTable(instance)];
             });
         });
     };

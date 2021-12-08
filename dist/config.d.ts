@@ -3,20 +3,20 @@ declare const _default: {
         netId1: {
             eth: {
                 instanceAddress: {
-                    '0.1': string;
-                    '1': string;
-                    '10': string;
-                    '100': string;
+                    "0.1": string;
+                    "1": string;
+                    "10": string;
+                    "100": string;
                 };
                 symbol: string;
                 decimals: number;
             };
             dai: {
                 instanceAddress: {
-                    '100': string;
-                    '1000': string;
-                    '10000': string;
-                    '100000': string;
+                    "100": string;
+                    "1000": string;
+                    "10000": string;
+                    "100000": string;
                 };
                 tokenAddress: string;
                 symbol: string;
@@ -24,10 +24,10 @@ declare const _default: {
             };
             cdai: {
                 instanceAddress: {
-                    '5000': string;
-                    '50000': string;
-                    '500000': string;
-                    '5000000': string;
+                    "5000": string;
+                    "50000": string;
+                    "500000": string;
+                    "5000000": string;
                 };
                 tokenAddress: string;
                 symbol: string;
@@ -35,8 +35,8 @@ declare const _default: {
             };
             usdc: {
                 instanceAddress: {
-                    '100': string;
-                    '1000': string;
+                    "100": string;
+                    "1000": string;
                 };
                 tokenAddress: string;
                 symbol: string;
@@ -44,8 +44,8 @@ declare const _default: {
             };
             usdt: {
                 instanceAddress: {
-                    '100': string;
-                    '1000': string;
+                    "100": string;
+                    "1000": string;
                 };
                 tokenAddress: string;
                 symbol: string;
@@ -53,33 +53,34 @@ declare const _default: {
             };
             wbtc: {
                 instanceAddress: {
-                    '0.1': string;
-                    '1': string;
-                    '10': string;
+                    "0.1": string;
+                    "1": string;
+                    "10": string;
                 };
                 tokenAddress: string;
                 symbol: string;
                 decimals: number;
             };
             proxy: string;
+            defaultProxy: string;
         };
         netId5: {
             eth: {
                 instanceAddress: {
-                    '0.1': string;
-                    '1': string;
-                    '10': string;
-                    '100': string;
+                    "0.1": string;
+                    "1": string;
+                    "10": string;
+                    "100": string;
                 };
                 symbol: string;
                 decimals: number;
             };
             dai: {
                 instanceAddress: {
-                    '100': string;
-                    '1000': string;
-                    '10000': string;
-                    '100000': string;
+                    "100": string;
+                    "1000": string;
+                    "10000": string;
+                    "100000": string;
                 };
                 tokenAddress: string;
                 symbol: string;
@@ -87,10 +88,10 @@ declare const _default: {
             };
             cdai: {
                 instanceAddress: {
-                    '5000': string;
-                    '50000': string;
-                    '500000': string;
-                    '5000000': string;
+                    "5000": string;
+                    "50000": string;
+                    "500000": string;
+                    "5000000": string;
                 };
                 tokenAddress: string;
                 symbol: string;
@@ -98,8 +99,8 @@ declare const _default: {
             };
             usdc: {
                 instanceAddress: {
-                    '100': string;
-                    '1000': string;
+                    "100": string;
+                    "1000": string;
                 };
                 tokenAddress: string;
                 symbol: string;
@@ -107,8 +108,8 @@ declare const _default: {
             };
             usdt: {
                 instanceAddress: {
-                    '100': string;
-                    '1000': string;
+                    "100": string;
+                    "1000": string;
                 };
                 tokenAddress: string;
                 symbol: string;
@@ -116,16 +117,21 @@ declare const _default: {
             };
             wbtc: {
                 instanceAddress: {
-                    '0.1': string;
-                    '1': string;
-                    '10': string;
+                    "0.1": string;
+                    "1": string;
+                    "10": string;
                 };
                 tokenAddress: string;
                 symbol: string;
                 decimals: number;
             };
             proxy: string;
+            defaultProxy: string;
         };
+    };
+    tornadoEventsService: {
+        endpoint: string;
+        version: string;
     };
 };
 export default _default;

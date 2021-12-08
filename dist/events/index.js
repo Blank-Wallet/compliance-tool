@@ -35,145 +35,99 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateTornadoEvents = exports.initTornadoEventsDB = exports.getTornadoEventsDb = exports.isInitialized = exports.TornadoEvents = void 0;
 var TornadoEventsDB_1 = require("./TornadoEventsDB");
+var TornadoEventsService_1 = require("./TornadoEventsService");
+var config_1 = __importDefault(require("../config"));
 var TornadoEvents;
 (function (TornadoEvents) {
     TornadoEvents["DEPOSIT"] = "Deposit";
     TornadoEvents["WITHDRAWAL"] = "Withdrawal";
 })(TornadoEvents = exports.TornadoEvents || (exports.TornadoEvents = {}));
 var _tornadoEventsDb = undefined;
+var _tornadoEventsService = new TornadoEventsService_1.TornadoEventsService({
+    endpoint: config_1.default.tornadoEventsService.endpoint,
+    version: config_1.default.tornadoEventsService.version,
+});
 var isInitialized = function () { return _tornadoEventsDb !== undefined; };
 exports.isInitialized = isInitialized;
 var getTornadoEventsDb = function () { return _tornadoEventsDb; };
 exports.getTornadoEventsDb = getTornadoEventsDb;
 var initTornadoEventsDB = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        _tornadoEventsDb = new TornadoEventsDB_1.TornadoEventsDB('blank_deposits_events', 1);
+        _tornadoEventsDb = new TornadoEventsDB_1.TornadoEventsDB("blank_deposits_events", 1);
         return [2 /*return*/, _tornadoEventsDb.createStoreInstances()];
     });
 }); };
 exports.initTornadoEventsDB = initTornadoEventsDB;
-var updateTornadoEvents = function (eventType, currencyAmountPair, network, provider, contract, forceUpdate) {
+var updateTornadoEvents = function (eventType, currencyAmountPair, _a, provider, contract, forceUpdate) {
+    var network = _a.network, chainId = _a.chainId;
     if (forceUpdate === void 0) { forceUpdate = false; }
     return __awaiter(void 0, void 0, void 0, function () {
-        var fetchEvents, lastQueriedBlock, fromBlockEvent, _a, events, newLastQueriedBlock, parsedEvents;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var fromBlockEvent, fromIndexEvent, fetchPromise, events;
+        var _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     if (!_tornadoEventsDb) {
-                        throw new Error('The events db must be initialized first!');
+                        throw new Error("The events db must be initialized first!");
                     }
-                    fetchEvents = function (fromBlock, toBlock) {
-                        if (toBlock === void 0) { toBlock = 'latest'; }
-                        return __awaiter(void 0, void 0, void 0, function () {
-                            var filter, blockNumber, getLogsPaginated;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        filter = contract.filters[eventType]();
-                                        return [4 /*yield*/, provider.getBlockNumber()];
-                                    case 1:
-                                        blockNumber = _a.sent();
-                                        if (toBlock === 'latest') {
-                                            toBlock = blockNumber;
-                                        }
-                                        getLogsPaginated = function (fromBlock, toBlock, obtainedEvents) {
-                                            if (obtainedEvents === void 0) { obtainedEvents = []; }
-                                            return __awaiter(void 0, void 0, void 0, function () {
-                                                var events_1, error_1, errCode, toNextBlock;
-                                                return __generator(this, function (_a) {
-                                                    switch (_a.label) {
-                                                        case 0:
-                                                            _a.trys.push([0, 2, , 3]);
-                                                            return [4 /*yield*/, contract.queryFilter(filter, fromBlock, toBlock)];
-                                                        case 1:
-                                                            events_1 = _a.sent();
-                                                            if (toBlock < blockNumber) {
-                                                                return [2 /*return*/, getLogsPaginated(toBlock + 1, blockNumber, __spreadArray(__spreadArray([], obtainedEvents), events_1))];
-                                                            }
-                                                            else {
-                                                                return [2 /*return*/, {
-                                                                        events: __spreadArray(__spreadArray([], obtainedEvents), events_1),
-                                                                        lastQueriedBlock: blockNumber,
-                                                                    }];
-                                                            }
-                                                            return [3 /*break*/, 3];
-                                                        case 2:
-                                                            error_1 = _a.sent();
-                                                            if (error_1.body) {
-                                                                errCode = JSON.parse(error_1.body).error.code;
-                                                                // More than 10k results
-                                                                if (errCode === -32005) {
-                                                                    toNextBlock = fromBlock + Math.floor((blockNumber - fromBlock) / 2);
-                                                                    return [2 /*return*/, getLogsPaginated(fromBlock, toNextBlock, obtainedEvents)];
-                                                                }
-                                                            }
-                                                            throw new Error('Unable to fetch the events');
-                                                        case 3: return [2 /*return*/];
-                                                    }
-                                                });
-                                            });
-                                        };
-                                        return [2 /*return*/, getLogsPaginated(fromBlock, toBlock)];
-                                }
-                            });
-                        });
-                    };
-                    return [4 /*yield*/, _tornadoEventsDb.getLastQueriedBlock(eventType, network, currencyAmountPair)];
+                    fromBlockEvent = 0;
+                    fromIndexEvent = 0;
+                    if (!!forceUpdate) return [3 /*break*/, 2];
+                    return [4 /*yield*/, Promise.all([
+                            _tornadoEventsDb.getLastQueriedBlock(eventType, network, currencyAmountPair),
+                            _tornadoEventsDb.getLastEventIndex(eventType, network, currencyAmountPair),
+                        ])];
                 case 1:
-                    lastQueriedBlock = _b.sent();
-                    fromBlockEvent = lastQueriedBlock !== 0 ? lastQueriedBlock + 1 : 0;
-                    // If forceUpdate is set to true we fetch every event from block 0
-                    if (forceUpdate) {
-                        fromBlockEvent = 0;
-                    }
-                    return [4 /*yield*/, fetchEvents(fromBlockEvent)];
+                    _b = _c.sent(), fromBlockEvent = _b[0], fromIndexEvent = _b[1];
+                    _c.label = 2;
                 case 2:
-                    _a = _b.sent(), events = _a.events, newLastQueriedBlock = _a.lastQueriedBlock;
-                    parsedEvents = eventType === TornadoEvents.DEPOSIT
-                        ? {
+                    if (eventType === TornadoEvents.DEPOSIT) {
+                        fetchPromise = _tornadoEventsService.getDeposits({
+                            chainId: chainId,
+                            pair: currencyAmountPair,
+                            from: fromIndexEvent,
+                            chainOptions: { contract: contract, fromBlock: fromBlockEvent },
+                            provider: provider,
+                        });
+                    }
+                    else {
+                        fetchPromise = _tornadoEventsService.getWithdrawals({
+                            chainId: chainId,
+                            pair: currencyAmountPair,
+                            from: fromIndexEvent,
+                            chainOptions: { contract: contract, fromBlock: fromBlockEvent },
+                            provider: provider,
+                        });
+                    }
+                    if (!forceUpdate) return [3 /*break*/, 4];
+                    return [4 /*yield*/, _tornadoEventsDb.truncateEvents(network, currencyAmountPair, {
                             type: eventType,
-                            events: events.map(function (ev) {
-                                var _a, _b, _c;
-                                return ({
-                                    transactionHash: ev.transactionHash,
-                                    blockNumber: ev.blockNumber,
-                                    commitment: (_a = ev.args) === null || _a === void 0 ? void 0 : _a.commitment,
-                                    leafIndex: (_b = ev.args) === null || _b === void 0 ? void 0 : _b.leafIndex,
-                                    timestamp: (_c = ev.args) === null || _c === void 0 ? void 0 : _c.timestamp.toString(),
-                                });
-                            }),
-                        }
-                        : {
-                            type: eventType,
-                            events: events.map(function (ev) {
-                                var _a, _b, _c;
-                                return ({
-                                    transactionHash: ev.transactionHash,
-                                    blockNumber: ev.blockNumber,
-                                    to: (_a = ev.args) === null || _a === void 0 ? void 0 : _a.to,
-                                    nullifierHex: (_b = ev.args) === null || _b === void 0 ? void 0 : _b.nullifierHash,
-                                    fee: (_c = ev.args) === null || _c === void 0 ? void 0 : _c.fee,
-                                });
-                            }),
-                        };
-                    // Update events
-                    return [4 /*yield*/, _tornadoEventsDb.updateEvents(network, currencyAmountPair, parsedEvents)];
+                        })];
                 case 3:
-                    // Update events
-                    _b.sent();
-                    // Update last fetched block
-                    return [4 /*yield*/, _tornadoEventsDb.updateLastQueriedBlock(eventType, network, currencyAmountPair, newLastQueriedBlock)];
-                case 4:
-                    // Update last fetched block
-                    _b.sent();
+                    _c.sent();
+                    _c.label = 4;
+                case 4: return [4 /*yield*/, fetchPromise];
+                case 5:
+                    events = _c.sent();
+                    if (events.length) {
+                        return [2 /*return*/, Promise.all([
+                                // Update events
+                                _tornadoEventsDb.updateEvents(network, currencyAmountPair, {
+                                    type: eventType,
+                                    events: eventType === TornadoEvents.DEPOSIT
+                                        ? events
+                                        : events,
+                                }),
+                                // Update last fetched block\
+                                _tornadoEventsDb.updateLastQueriedBlock(eventType, network, currencyAmountPair, events.at(-1).blockNumber),
+                            ])];
+                    }
                     return [2 /*return*/];
             }
         });

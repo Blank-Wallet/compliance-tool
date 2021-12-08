@@ -50,10 +50,11 @@ var Mixer_abi_json_1 = __importDefault(require("./abi/Mixer.abi.json"));
 // Set provider
 var providers = {
     mainnet: undefined,
-    goerli: undefined
+    goerli: undefined,
 };
 var getProvider = function (network) {
     if (providers[network] === undefined) {
+        // TODO: Add provider urls
         providers[network] = new ethers_1.ethers.providers.JsonRpcProvider();
     }
     return providers[network];
@@ -62,17 +63,17 @@ var getProvider = function (network) {
 var toHex = function (number, length) {
     if (length === void 0) { length = 32; }
     var str = number instanceof Buffer
-        ? number.toString('hex')
-        : snarkjs_1.bigInt(number).toString(16);
-    return '0x' + str.padStart(length * 2, '0');
+        ? number.toString("hex")
+        : (0, snarkjs_1.bigInt)(number).toString(16);
+    return "0x" + str.padStart(length * 2, "0");
 };
 var getPedersenHash = function (data) {
-    return snarkjs_1.bigInt(circomlib_1.babyJub.unpackPoint(circomlib_1.pedersenHash.hash(data))[0]);
+    return (0, snarkjs_1.bigInt)(circomlib_1.babyJub.unpackPoint(circomlib_1.pedersenHash.hash(data))[0]);
 };
 var parseDeposit = function (note) { return __awaiter(void 0, void 0, void 0, function () {
     var buf, nullifier, secret, preImage, commitment, commitmentHex, nullifierHash, nullifierHex;
     return __generator(this, function (_a) {
-        buf = Buffer.from(note, 'hex');
+        buf = Buffer.from(note, "hex");
         nullifier = snarkjs_1.bigInt.leBuff2int(buf.slice(0, 31));
         secret = snarkjs_1.bigInt.leBuff2int(buf.slice(31, 62));
         preImage = Buffer.concat([
@@ -95,7 +96,7 @@ var parseDeposit = function (note) { return __awaiter(void 0, void 0, void 0, fu
     });
 }); };
 var isValidNoteString = function (noteString) {
-    var noteRegex = /blank-(?<currency>\w+)-(?<amount>[\d.]+)-(?<chainId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g;
+    var noteRegex = /tornado-(?<currency>\w+)-(?<amount>[\d.]+)-(?<chainId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g;
     var match = noteRegex.exec(noteString);
     if (!match || !match.groups) {
         return false;
@@ -108,8 +109,8 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!!events_1.isInitialized()) return [3 /*break*/, 2];
-                return [4 /*yield*/, events_1.initTornadoEventsDB()];
+                if (!!(0, events_1.isInitialized)()) return [3 /*break*/, 2];
+                return [4 /*yield*/, (0, events_1.initTornadoEventsDB)()];
             case 1:
                 _a.sent();
                 _a.label = 2;
@@ -118,51 +119,48 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                     deposit: {},
                     withdrawal: {},
                 };
-                noteRegex = /blank-(?<currency>\w+)-(?<amount>[\d.]+)-(?<chainId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g;
+                noteRegex = /tornado-(?<currency>\w+)-(?<amount>[\d.]+)-(?<chainId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g;
                 match = noteRegex.exec(noteString);
                 if (!match || !match.groups) {
-                    throw new Error('The note has invalid format');
+                    throw new Error("The note has invalid format");
                 }
                 pair = {
                     currency: match.groups.currency,
-                    amount: match.groups.amount
+                    amount: match.groups.amount,
                 };
                 note = match.groups.note;
                 chainId = parseInt(match.groups.chainId);
                 if (!(chainId in types_1.Networks)) {
-                    throw new Error('This note is from an invalid network');
+                    throw new Error("This note is from an invalid network");
                 }
                 network = types_1.Networks[chainId];
                 return [4 /*yield*/, parseDeposit(note)];
             case 3:
                 parsedDeposit = _a.sent();
-                networkKey = "netId" + chainId;
+                networkKey = "netId".concat(chainId);
                 deployments = config_1.default.deployments;
                 contractAddress = deployments[networkKey][pair.currency].instanceAddress[pair.amount];
                 contract = new ethers_1.Contract(contractAddress, Mixer_abi_json_1.default, getProvider(network));
                 // Update deposit events
-                return [4 /*yield*/, events_1.updateTornadoEvents(events_1.TornadoEvents.DEPOSIT, pair, network, getProvider(network), contract)];
+                return [4 /*yield*/, (0, events_1.updateTornadoEvents)(events_1.TornadoEvents.DEPOSIT, pair, { network: network, chainId: chainId }, getProvider(network), contract)];
             case 4:
                 // Update deposit events
                 _a.sent();
                 // Update withdrawal events
-                return [4 /*yield*/, events_1.updateTornadoEvents(events_1.TornadoEvents.WITHDRAWAL, pair, network, getProvider(network), contract)];
+                return [4 /*yield*/, (0, events_1.updateTornadoEvents)(events_1.TornadoEvents.WITHDRAWAL, pair, { network: network, chainId: chainId }, getProvider(network), contract)];
             case 5:
                 // Update withdrawal events
                 _a.sent();
-                return [4 /*yield*/, events_1.getTornadoEventsDb().getDepositEventByCommitment(network, pair, parsedDeposit.commitmentHex)];
+                return [4 /*yield*/, (0, events_1.getTornadoEventsDb)().getDepositEventByCommitment(network, pair, parsedDeposit.commitmentHex)];
             case 6:
                 depEv = _a.sent();
                 if (!depEv) {
-                    throw new Error('Deposit not found on events');
+                    throw new Error("Deposit not found on events");
                 }
-                return [4 /*yield*/, events_1.getTornadoEventsDb().isSpent(network, pair, parsedDeposit.nullifierHex)
-                    // Get transaction receipt
-                ];
+                return [4 /*yield*/, (0, events_1.getTornadoEventsDb)().isSpent(network, pair, parsedDeposit.nullifierHex)];
             case 7:
                 spent = _a.sent();
-                return [4 /*yield*/, getProvider(network)
-                        .getTransactionReceipt(depEv.transactionHash)];
+                return [4 /*yield*/, getProvider(network).getTransactionReceipt(depEv.transactionHash)];
             case 8:
                 receipt = _a.sent();
                 depositComplianceInfo.deposit = {
@@ -176,15 +174,14 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                 if (!spent) {
                     return [2 /*return*/, depositComplianceInfo];
                 }
-                return [4 /*yield*/, events_1.getTornadoEventsDb().getWithdrawalEventByNullifier(network, pair, parsedDeposit.nullifierHex)];
+                return [4 /*yield*/, (0, events_1.getTornadoEventsDb)().getWithdrawalEventByNullifier(network, pair, parsedDeposit.nullifierHex)];
             case 9:
                 withdrawEv = _a.sent();
                 if (!withdrawEv) {
                     // Deposit has not been withdrawn yet
                     return [2 /*return*/, depositComplianceInfo];
                 }
-                return [4 /*yield*/, getProvider(network)
-                        .getBlock(withdrawEv.blockNumber)];
+                return [4 /*yield*/, getProvider(network).getBlock(withdrawEv.blockNumber)];
             case 10:
                 timestamp = (_a.sent()).timestamp;
                 depositComplianceInfo.withdrawal = {

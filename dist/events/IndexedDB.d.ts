@@ -1,4 +1,4 @@
-import { StoreKey, StoreNames, StoreValue } from 'idb';
+import { IDBPCursorWithValue, StoreKey, StoreNames, StoreValue } from "idb";
 export default class IndexedDB<T> {
     private database;
     private dbVersion;
@@ -10,13 +10,17 @@ export default class IndexedDB<T> {
         indexes: string[];
         autoIncrement?: boolean;
     }[]): Promise<void>;
-    getIndexCursor(tableName: StoreNames<T>, mode?: IDBTransactionMode): Promise<import("idb").IDBPCursorWithValue<T, [StoreNames<T>], StoreNames<T>, unknown, "versionchange" | "readonly" | "readwrite"> | null>;
+    getIndexCursor(tableName: StoreNames<T>, mode?: IDBTransactionMode): Promise<IDBPCursorWithValue<T, [
+        StoreNames<T>
+    ], StoreNames<T>, unknown, "versionchange" | "readonly" | "readwrite"> | null>;
     exists(name: StoreNames<T>): boolean;
     getValueFromIndex(tableName: StoreNames<T>, indexName: string, key: string): Promise<StoreValue<T, StoreNames<T>> | undefined>;
     getValue(tableName: StoreNames<T>, id: IDBKeyRange | StoreKey<T, StoreNames<T>>): Promise<StoreValue<T, StoreNames<T>> | undefined>;
     getAllFromIndex(tableName: StoreNames<T>, index: string, query?: IDBKeyRange): Promise<StoreValue<T, StoreNames<T>>[]>;
     getAllValues(tableName: StoreNames<T>): Promise<StoreValue<T, StoreNames<T>>[]>;
+    countAllValues(tableName: StoreNames<T>): Promise<number>;
     putValue(tableName: StoreNames<T>, value: StoreValue<T, StoreNames<T>>): Promise<StoreKey<T, StoreNames<T>>>;
     putBulkValues(tableName: StoreNames<T>, values: StoreValue<T, StoreNames<T>>[]): Promise<void>;
     deleteValue(tableName: StoreNames<T>, id: IDBKeyRange | StoreKey<T, StoreNames<T>>): Promise<void>;
+    truncateTable(tableName: StoreNames<T>): Promise<void>;
 }

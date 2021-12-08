@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable @typescript-eslint/no-explicit-any */
 var idb_1 = require("idb");
 var IndexedDB = /** @class */ (function () {
     function IndexedDB(database, dbVersion) {
@@ -66,7 +67,7 @@ var IndexedDB = /** @class */ (function () {
                             }
                         };
                         _a = this;
-                        return [4 /*yield*/, idb_1.openDB(this.database, this.dbVersion, {
+                        return [4 /*yield*/, (0, idb_1.openDB)(this.database, this.dbVersion, {
                                 upgrade: upgrade,
                             })];
                     case 1:
@@ -77,8 +78,8 @@ var IndexedDB = /** @class */ (function () {
         });
     };
     IndexedDB.prototype.getIndexCursor = function (tableName, mode) {
-        if (mode === void 0) { mode = 'readonly'; }
-        return this.db.transaction(tableName, mode).store.openCursor(null, 'prev');
+        if (mode === void 0) { mode = "readonly"; }
+        return this.db.transaction(tableName, mode).store.openCursor(null, "prev");
     };
     IndexedDB.prototype.exists = function (name) {
         return this.db.objectStoreNames.contains(name);
@@ -111,6 +112,13 @@ var IndexedDB = /** @class */ (function () {
             });
         });
     };
+    IndexedDB.prototype.countAllValues = function (tableName) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.db.count(tableName)];
+            });
+        });
+    };
     IndexedDB.prototype.putValue = function (tableName, value) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -120,26 +128,22 @@ var IndexedDB = /** @class */ (function () {
     };
     IndexedDB.prototype.putBulkValues = function (tableName, values) {
         return __awaiter(this, void 0, void 0, function () {
-            var tx, store, _i, values_1, value;
+            var store;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        tx = this.db.transaction(tableName, 'readwrite');
-                        store = tx.objectStore(tableName);
-                        _i = 0, values_1 = values;
-                        _a.label = 1;
-                    case 1:
-                        if (!(_i < values_1.length)) return [3 /*break*/, 4];
-                        value = values_1[_i];
-                        return [4 /*yield*/, store.put(value)];
-                    case 2:
-                        _a.sent();
-                        _a.label = 3;
-                    case 3:
-                        _i++;
-                        return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/];
-                }
+                store = (0, idb_1.unwrap)(this.db.transaction(tableName, "readwrite")).objectStore(tableName);
+                return [2 /*return*/, new Promise(function (resolve) {
+                        var i = 0;
+                        function putNext() {
+                            if (i < values.length - 1) {
+                                store.put(values[i]).onsuccess = putNext;
+                            }
+                            else {
+                                store.put(values[i]).onsuccess = function () { return resolve(); };
+                            }
+                            ++i;
+                        }
+                        putNext();
+                    })];
             });
         });
     };
@@ -149,16 +153,26 @@ var IndexedDB = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        tx = this.db.transaction(tableName, 'readwrite');
+                        tx = this.db.transaction(tableName, "readwrite");
                         store = tx.objectStore(tableName);
                         return [4 /*yield*/, store.get(id)];
                     case 1:
                         result = _a.sent();
                         if (!result) {
-                            throw new Error('Id not found');
+                            throw new Error("Id not found");
                         }
                         return [2 /*return*/, store.delete(id)];
                 }
+            });
+        });
+    };
+    IndexedDB.prototype.truncateTable = function (tableName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var tx, store;
+            return __generator(this, function (_a) {
+                tx = this.db.transaction(tableName, "readwrite");
+                store = tx.objectStore(tableName);
+                return [2 /*return*/, store.clear()];
             });
         });
     };

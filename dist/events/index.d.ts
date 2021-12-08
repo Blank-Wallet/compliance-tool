@@ -1,4 +1,5 @@
-import { Contract, ethers } from "ethers";
+import { Contract } from "ethers";
+import { JsonRpcProvider } from "@ethersproject/providers";
 import { AvailableNetworks, KnownCurrencies } from "../types";
 import { TornadoEventsDB } from "./TornadoEventsDB";
 export declare enum TornadoEvents {
@@ -11,4 +12,7 @@ export declare const initTornadoEventsDB: () => Promise<void>;
 export declare const updateTornadoEvents: (eventType: TornadoEvents, currencyAmountPair: {
     currency: KnownCurrencies;
     amount: string;
-}, network: AvailableNetworks, provider: ethers.providers.JsonRpcProvider, contract: Contract, forceUpdate?: boolean) => Promise<void>;
+}, { network, chainId }: {
+    network: AvailableNetworks;
+    chainId: number;
+}, provider: JsonRpcProvider, contract: Contract, forceUpdate?: boolean) => Promise<void>;
