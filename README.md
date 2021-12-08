@@ -1,6 +1,6 @@
 # Compliance tool
 
-### Allows to obtain compliance information out of a blank note string.
+### Allows to obtain compliance information out of a deposit note string.
 
 The package create an instance of InstanceDB to store all the Tornado deposits and withdrawal events
 that are queried, which is why it is not currently compatible with node environments.
@@ -13,12 +13,12 @@ How to:
     ...
 
     // Check if note is valid
-    const isValid: boolean = isValidNoteString('blank-1-eth-1-0x...')
+    const isValid: boolean = isValidNoteString('tornado-1-eth-1-0x...')
 
     // Obtain compliance report
     try {
         const complianceReport = 
-            await getComplianceInformation('blank-1-eth-1-0x...');
+            await getComplianceInformation('tornado-1-eth-1-0x...');
     } catch(error) {
         // Catch possible errors while generating report
     }

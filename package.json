@@ -4,13 +4,15 @@
   "description": "Compliance tool for Blank Wallet",
   "main": "dist/index.js",
   "dependencies": {
+    "axios": "^0.24.0",
     "circomlib": "git+https://github.com/tornadocash/circomlib.git#3b492f9801573eebcfe1b6c584afe8a3beecf2b4",
     "ethers": "^5.4.4",
     "idb": "^6.1.2",
     "snarkjs": "git+https://github.com/tornadocash/snarkjs.git#869181cfaf7526fe8972073d31655493a04326d5"
   },
   "devDependencies": {
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.2"
   },
   "scripts": {
     "build": "rimraf ./dist && tsc"
@@ -24,5 +26,12 @@
   "bugs": {
     "url": "https://github.com/Blank-Wallet/compliance-tool/issues"
   },
-  "homepage": "https://github.com/Blank-Wallet/compliance-tool#readme"
+  "homepage": "https://github.com/Blank-Wallet/compliance-tool#readme",
+  "resolutions": {
+    "circomlib/**/yargs-parser": "^18.1.2",
+    "circomlib/**/ws": "^5.2.3",
+    "circomlib/**/ansi-regex": "^5.0.1",
+    "snarkjs/**/yargs-parser": "^18.1.2",
+    "snarkjs/**/ansi-regex": "^5.0.1"
+  }
 }

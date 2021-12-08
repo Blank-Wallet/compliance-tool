@@ -1,141 +1,106 @@
-import { Contract, ethers, Event } from "ethers";
+import { Contract } from "ethers";
+import { JsonRpcProvider } from "@ethersproject/providers";
 import { AvailableNetworks, KnownCurrencies } from "../types";
-import ITornadoEventsDB, { DepositsEventsDbKey, WithdrawalsEventsDbKey } from "./ITornadoEventsDB";
-import { TornadoEventsDB } from "./TornadoEventsDB";
+import { Deposit, Withdrawal } from "./ITornadoEventsDB";
+import { EventsUpdateType, TornadoEventsDB } from "./TornadoEventsDB";
+import { TornadoEventsService } from "./TornadoEventsService";
+import config from "../config";
 
 export enum TornadoEvents {
-    DEPOSIT = 'Deposit',
-    WITHDRAWAL = 'Withdrawal',
+  DEPOSIT = "Deposit",
+  WITHDRAWAL = "Withdrawal",
 }
 
-let _tornadoEventsDb: TornadoEventsDB | undefined = undefined
+let _tornadoEventsDb: TornadoEventsDB | undefined = undefined;
+let _tornadoEventsService: TornadoEventsService = new TornadoEventsService({
+  endpoint: config.tornadoEventsService.endpoint,
+  version: config.tornadoEventsService.version,
+});
 
-export const isInitialized = () => _tornadoEventsDb !== undefined
-export const getTornadoEventsDb = () => _tornadoEventsDb
+export const isInitialized = () => _tornadoEventsDb !== undefined;
+export const getTornadoEventsDb = () => _tornadoEventsDb;
 
-export const initTornadoEventsDB = async() => {
-    _tornadoEventsDb = new TornadoEventsDB('blank_deposits_events', 1);
-    return _tornadoEventsDb.createStoreInstances()
-}
+export const initTornadoEventsDB = async () => {
+  _tornadoEventsDb = new TornadoEventsDB("blank_deposits_events", 1);
+  return _tornadoEventsDb.createStoreInstances();
+};
 
 export const updateTornadoEvents = async (
-    eventType: TornadoEvents,
-    currencyAmountPair: {currency: KnownCurrencies, amount: string},
-    network: AvailableNetworks,
-    provider: ethers.providers.JsonRpcProvider,
-    contract: Contract,
-    forceUpdate: boolean = false,
-  ) => {
-    if(!_tornadoEventsDb) {
-        throw new Error('The events db must be initialized first!')
-    }
+  eventType: TornadoEvents,
+  currencyAmountPair: { currency: KnownCurrencies; amount: string },
+  { network, chainId }: { network: AvailableNetworks; chainId: number },
+  provider: JsonRpcProvider,
+  contract: Contract,
+  forceUpdate = false
+) => {
+  if (!_tornadoEventsDb) {
+    throw new Error("The events db must be initialized first!");
+  }
 
-    const fetchEvents = async (
-      fromBlock: number,
-      toBlock: number | 'latest' = 'latest',
-    ): Promise<{ events: Event[]; lastQueriedBlock: number }> => {
-      const filter = contract.filters[eventType]();
-      const blockNumber = await provider.getBlockNumber();
+  let fromBlockEvent = 0;
+  let fromIndexEvent = 0;
 
-      if (toBlock === 'latest') {
-        toBlock = blockNumber;
-      }
+  if (!forceUpdate) {
+    [fromBlockEvent, fromIndexEvent] = await Promise.all([
+      _tornadoEventsDb.getLastQueriedBlock(
+        eventType,
+        network,
+        currencyAmountPair
+      ),
+      _tornadoEventsDb.getLastEventIndex(
+        eventType,
+        network,
+        currencyAmountPair
+      ),
+    ]);
+  }
 
-      const getLogsPaginated = async (
-        fromBlock: number,
-        toBlock: number,
-        obtainedEvents: Event[] = [],
-      ): Promise<{ events: Event[]; lastQueriedBlock: number }> => {
-        try {
-          const events = await contract.queryFilter(filter, fromBlock, toBlock);
-          if (toBlock < blockNumber) {
-            return getLogsPaginated(toBlock + 1, blockNumber, [
-              ...obtainedEvents,
-              ...events,
-            ]);
-          } else {
-            return {
-              events: [...obtainedEvents, ...events],
-              lastQueriedBlock: blockNumber,
-            };
-          }
-        } catch (error) {
-          if (error.body) {
-            const errCode = JSON.parse(error.body).error.code;
-            // More than 10k results
-            if (errCode === -32005) {
-              const toNextBlock =
-                fromBlock + Math.floor((blockNumber - fromBlock) / 2);
-              return getLogsPaginated(fromBlock, toNextBlock, obtainedEvents);
-            }
-          }
-          throw new Error('Unable to fetch the events');
-        }
-      };
+  let fetchPromise: Promise<Deposit[] | Withdrawal[]>;
 
-      return getLogsPaginated(fromBlock, toBlock);
-    };
+  if (eventType === TornadoEvents.DEPOSIT) {
+    fetchPromise = _tornadoEventsService.getDeposits({
+      chainId: chainId,
+      pair: currencyAmountPair,
+      from: fromIndexEvent,
+      chainOptions: { contract, fromBlock: fromBlockEvent },
+      provider,
+    });
+  } else {
+    fetchPromise = _tornadoEventsService.getWithdrawals({
+      chainId: chainId,
+      pair: currencyAmountPair,
+      from: fromIndexEvent,
+      chainOptions: { contract, fromBlock: fromBlockEvent },
+      provider,
+    });
+  }
 
-    // Get last queried block
-    const lastQueriedBlock = await _tornadoEventsDb.getLastQueriedBlock(
-      eventType,
-      network as AvailableNetworks,
-      currencyAmountPair,
-    );
-    let fromBlockEvent = lastQueriedBlock !== 0 ? lastQueriedBlock + 1 : 0;
+  if (forceUpdate) {
+    await _tornadoEventsDb.truncateEvents(network, currencyAmountPair, {
+      type: eventType,
+    } as EventsUpdateType);
+  }
 
-    // If forceUpdate is set to true we fetch every event from block 0
-    if (forceUpdate) {
-      fromBlockEvent = 0;
-    }
+  const events = await fetchPromise;
 
-    // Fetch events from next to last queried block
-    const { events, lastQueriedBlock: newLastQueriedBlock } = await fetchEvents(
-      fromBlockEvent,
-    );
+  if (events.length) {
+    return Promise.all([
+      // Update events
+      _tornadoEventsDb.updateEvents(network, currencyAmountPair, {
+        type: eventType,
+        events:
+          eventType === TornadoEvents.DEPOSIT
+            ? (events as Deposit[])
+            : (events as Withdrawal[]),
+      } as EventsUpdateType),
 
-    // Parse obtained events
-    const parsedEvents =
-      eventType === TornadoEvents.DEPOSIT
-        ? {
-            type: eventType,
-            events: events.map(
-              (ev: Event) =>
-                ({
-                  transactionHash: ev.transactionHash,
-                  blockNumber: ev.blockNumber,
-                  commitment: ev.args?.commitment,
-                  leafIndex: ev.args?.leafIndex,
-                  timestamp: ev.args?.timestamp.toString(),
-                } as ITornadoEventsDB[DepositsEventsDbKey]['value']),
-            ),
-          }
-        : {
-            type: eventType,
-            events: events.map(
-              (ev: Event) =>
-                ({
-                  transactionHash: ev.transactionHash,
-                  blockNumber: ev.blockNumber,
-                  to: ev.args?.to,
-                  nullifierHex: ev.args?.nullifierHash,
-                  fee: ev.args?.fee,
-                } as ITornadoEventsDB[WithdrawalsEventsDbKey]['value']),
-            ),
-          };
-
-    // Update events
-    await _tornadoEventsDb.updateEvents(
-      network as AvailableNetworks,
-      currencyAmountPair,
-      parsedEvents,
-    );
-
-    // Update last fetched block
-    await _tornadoEventsDb.updateLastQueriedBlock(
-      eventType,
-      network as AvailableNetworks,
-      currencyAmountPair,
-      newLastQueriedBlock,
-    );
-  };
+      // Update last fetched block\
+      _tornadoEventsDb.updateLastQueriedBlock(
+        eventType,
+        network,
+        currencyAmountPair,
+        events.at(-1)!.blockNumber
+      ),
+    ]) as unknown as Promise<void>;
+  }
+};

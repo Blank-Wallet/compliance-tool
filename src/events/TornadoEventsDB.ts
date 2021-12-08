@@ -1,22 +1,27 @@
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import IndexedDB from "./IndexedDB";
 import ITornadoEventsDB, {
+  Deposit,
   DepositsEventsDbKey,
+  Withdrawal,
   WithdrawalsEventsDbKey,
-} from './ITornadoEventsDB';
-
-import { StoreNames } from 'idb';
-import { TornadoEvents } from './index';
-import IndexedDB from './IndexedDB';
-import { AvailableNetworks, CurrencyAmountArray, CurrencyAmountPair } from '../types';
+} from "./ITornadoEventsDB";
+import {
+  AvailableNetworks,
+  CurrencyAmountArray,
+  CurrencyAmountPair,
+} from "../types";
+import { StoreNames } from "idb";
+import { TornadoEvents } from "./index";
 
 export type EventsUpdateType =
   | {
       type: TornadoEvents.DEPOSIT;
-      events: ITornadoEventsDB[DepositsEventsDbKey]['value'][];
+      events: Deposit[];
     }
   | {
       type: TornadoEvents.WITHDRAWAL;
-      events: ITornadoEventsDB[WithdrawalsEventsDbKey]['value'][];
+      events: Withdrawal[];
     };
 
 export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
@@ -29,8 +34,8 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
    */
   public getDepositTableName(
     network: AvailableNetworks,
-    { currency, amount }: CurrencyAmountPair,
-  ) {
+    { currency, amount }: CurrencyAmountPair
+  ): DepositsEventsDbKey {
     return `deposits-${network}-${currency}-${amount}` as DepositsEventsDbKey;
   }
 
@@ -43,7 +48,7 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
    */
   private getWithdrawalTableName(
     network: AvailableNetworks,
-    { currency, amount }: CurrencyAmountPair,
+    { currency, amount }: CurrencyAmountPair
   ) {
     return `withdrawals-${network}-${currency}-${amount}` as WithdrawalsEventsDbKey;
   }
@@ -59,7 +64,7 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
   private getStoreInstanceName(
     eventType: TornadoEvents,
     network: AvailableNetworks,
-    pair: CurrencyAmountPair,
+    pair: CurrencyAmountPair
   ) {
     return eventType === TornadoEvents.DEPOSIT
       ? this.getDepositTableName(network, pair)
@@ -77,17 +82,17 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
   public async getLastQueriedBlock(
     eventType: TornadoEvents,
     network: AvailableNetworks,
-    pair: CurrencyAmountPair,
-  ) {
+    pair: CurrencyAmountPair
+  ): Promise<number> {
     const instance = this.getStoreInstanceName(eventType, network, pair);
 
     let value = (await this.getValue(
-      'lastEvents',
-      instance,
-    )) as ITornadoEventsDB['lastEvents']['value'];
+      "lastEvents",
+      instance
+    )) as ITornadoEventsDB["lastEvents"]["value"];
     if (!value) {
       value = { instance, lastQueriedBlock: 0 };
-      await this.putValue('lastEvents', value);
+      await this.putValue("lastEvents", value);
     }
 
     return value.lastQueriedBlock;
@@ -102,8 +107,8 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
    */
   public async getLastLeafIndex(
     network: AvailableNetworks,
-    pair: CurrencyAmountPair,
-  ) {
+    pair: CurrencyAmountPair
+  ): Promise<number> {
     const instance = this.getDepositTableName(network, pair);
 
     const cursor = await this.getIndexCursor(instance);
@@ -111,10 +116,20 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
       return 0;
     }
     const { leafIndex } = {
-      ...(cursor.value as ITornadoEventsDB[DepositsEventsDbKey]['value']),
+      ...(cursor.value as Deposit),
     };
 
     return leafIndex;
+  }
+
+  public async getLastEventIndex(
+    eventType: TornadoEvents,
+    network: AvailableNetworks,
+    pair: CurrencyAmountPair
+  ): Promise<number> {
+    const instance = this.getStoreInstanceName(eventType, network, pair);
+
+    return this.countAllValues(instance);
   }
 
   /**
@@ -129,14 +144,14 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
     eventType: TornadoEvents,
     network: AvailableNetworks,
     pair: CurrencyAmountPair,
-    lastQueriedBlock: number,
-  ) {
+    lastQueriedBlock: number
+  ): Promise<string | number> {
     const instance = this.getStoreInstanceName(eventType, network, pair);
 
-    return await this.putValue('lastEvents', {
+    return this.putValue("lastEvents", {
       instance,
       lastQueriedBlock,
-    } as ITornadoEventsDB['lastEvents']['value']);
+    } as ITornadoEventsDB["lastEvents"]["value"]);
   }
 
   /**
@@ -151,12 +166,12 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
   public async isSpent(
     network: AvailableNetworks,
     pair: CurrencyAmountPair,
-    nullifier: string,
-  ) {
+    nullifier: string
+  ): Promise<boolean> {
     const isSpent = await this.getWithdrawalEventByNullifier(
       network,
       pair,
-      nullifier,
+      nullifier
     );
     return !!isSpent;
   }
@@ -173,12 +188,12 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
   public async getWithdrawalEventByNullifier(
     network: AvailableNetworks,
     pair: CurrencyAmountPair,
-    nullifier: string,
-  ) {
+    nullifier: string
+  ): Promise<Withdrawal | undefined> {
     const instance = this.getWithdrawalTableName(network, pair);
 
     return this.getValue(instance, nullifier) as Promise<
-      ITornadoEventsDB[WithdrawalsEventsDbKey]['value'] | undefined
+      Withdrawal | undefined
     >;
   }
 
@@ -194,15 +209,15 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
   public async getDepositEventByCommitment(
     network: AvailableNetworks,
     pair: CurrencyAmountPair,
-    commitment: string,
-  ) {
+    commitment: string
+  ): Promise<Deposit | undefined> {
     const instance = this.getDepositTableName(network, pair);
 
     return this.getValueFromIndex(
       instance,
-      'commitment',
-      commitment,
-    ) as Promise<ITornadoEventsDB[DepositsEventsDbKey]['value'] | undefined>;
+      "commitment",
+      commitment
+    ) as Promise<Deposit | undefined>;
   }
 
   /**
@@ -215,15 +230,15 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
   public async getAllDepositsByLeafIndex(
     network: AvailableNetworks,
     pair: CurrencyAmountPair,
-    lastLeafIndex?: number,
-  ) {
+    lastLeafIndex?: number
+  ): Promise<Deposit[]> {
     const instance = this.getDepositTableName(network, pair);
 
     return this.getAllFromIndex(
       instance,
-      'leafIndex',
-      lastLeafIndex ? IDBKeyRange.lowerBound(lastLeafIndex + 1) : undefined,
-    ) as Promise<ITornadoEventsDB[DepositsEventsDbKey]['value'][]>;
+      "leafIndex",
+      lastLeafIndex ? IDBKeyRange.lowerBound(lastLeafIndex + 1) : undefined
+    ) as Promise<Deposit[]>;
   }
 
   /**
@@ -234,10 +249,12 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
    * @param pair The currency/amount pair
    * @returns All the specified instance Tornado events
    */
+  // Complex type
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public async getAllEvents(
     eventType: TornadoEvents,
     network: AvailableNetworks,
-    pair: CurrencyAmountPair,
+    pair: CurrencyAmountPair
   ) {
     const instance = this.getStoreInstanceName(eventType, network, pair);
 
@@ -249,7 +266,7 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
    *
    * It creates the required store instances
    */
-  public async createStoreInstances() {
+  public async createStoreInstances(): Promise<void> {
     const tables: {
       name: StoreNames<ITornadoEventsDB>;
       keyPath: string;
@@ -266,13 +283,13 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
             `withdrawals-${network}-${currency}-${v}` as WithdrawalsEventsDbKey;
           tables.push({
             name: depositName,
-            keyPath: 'leafIndex',
-            indexes: ['leafIndex', 'commitment'],
+            keyPath: "leafIndex",
+            indexes: ["leafIndex", "commitment"],
           });
           tables.push({
             name: withdrawalName,
-            keyPath: 'nullifierHex',
-            indexes: ['nullifierHex'],
+            keyPath: "nullifierHex",
+            indexes: ["nullifierHex"],
           });
         });
       }
@@ -280,9 +297,9 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
 
     // Create LastEvents table
     tables.push({
-      name: 'lastEvents',
-      keyPath: 'instance',
-      indexes: ['instance'],
+      name: "lastEvents",
+      keyPath: "instance",
+      indexes: ["instance"],
     });
 
     return this.createObjectStore(tables);
@@ -300,11 +317,29 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
   public async updateEvents(
     network: AvailableNetworks,
     pair: CurrencyAmountPair,
-    { type, events }: EventsUpdateType,
-  ) {
+    { type, events }: EventsUpdateType
+  ): Promise<void> {
     const instance = this.getStoreInstanceName(type, network, pair);
 
     return this.putBulkValues(instance, events);
   }
-}
 
+  /**
+   * truncateEvents
+   *
+   * It deletes all the events for the specified instance
+   *
+   * @param network The current network
+   * @param pair The currency/amount pair
+   * @param param2 The type/events object
+   */
+  public async truncateEvents(
+    network: AvailableNetworks,
+    pair: CurrencyAmountPair,
+    { type }: EventsUpdateType
+  ): Promise<void> {
+    const instance = this.getStoreInstanceName(type, network, pair);
+
+    return this.truncateTable(instance);
+  }
+}
