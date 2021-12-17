@@ -39,11 +39,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getComplianceInformation = exports.isValidNoteString = void 0;
+exports.ethers = exports.getComplianceInformation = exports.isValidNoteString = void 0;
 var snarkjs_1 = require("snarkjs");
 var circomlib_1 = require("circomlib");
 var types_1 = require("./types");
 var ethers_1 = require("ethers");
+Object.defineProperty(exports, "ethers", { enumerable: true, get: function () { return ethers_1.ethers; } });
 var events_1 = require("./events");
 var config_1 = __importDefault(require("./config"));
 var Mixer_abi_json_1 = __importDefault(require("./abi/Mixer.abi.json"));

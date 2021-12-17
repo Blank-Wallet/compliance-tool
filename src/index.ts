@@ -215,3 +215,7 @@ export const getComplianceInformation = async (
 
   return depositComplianceInfo;
 };
+
+export {
+  ethers
+};
