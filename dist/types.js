@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CurrencyAmountArray = exports.Endpoints = exports.Networks = exports.AvailableNetworks = exports.KnownCurrencies = void 0;
+exports.CurrencyAmountArray = exports.Endpoints = exports.Networks = exports.AvailableNetworks = exports.getTokenDecimals = exports.KnownCurrencies = void 0;
 var config_1 = __importDefault(require("./config"));
 var instances = config_1.default.deployments.netId1;
 var KnownCurrencies;
@@ -15,6 +15,22 @@ var KnownCurrencies;
     KnownCurrencies["USDT"] = "usdt";
     KnownCurrencies["WBTC"] = "wbtc";
 })(KnownCurrencies = exports.KnownCurrencies || (exports.KnownCurrencies = {}));
+/**
+ * getTokenDecimals
+ *
+ * Obtains the decimal numbers of a pair token
+ *
+ * @param chainId The note chainId
+ * @param pair The note pair
+ * @returns The pair token decimals
+ */
+var getTokenDecimals = function (chainId, pair) {
+    if (!(chainId in exports.Networks)) {
+        throw new Error("Chain not supported");
+    }
+    return config_1.default.deployments["netId".concat(chainId)][pair.currency.toLowerCase()].decimals;
+};
+exports.getTokenDecimals = getTokenDecimals;
 var AvailableNetworks;
 (function (AvailableNetworks) {
     AvailableNetworks["MAINNET"] = "mainnet";
@@ -25,8 +41,8 @@ exports.Networks = {
     5: "goerli",
 };
 exports.Endpoints = {
-    'mainnet': 'https://mainnet-node.goblank.io',
-    'goerli': 'https://goerli-node.goblank.io'
+    mainnet: "https://mainnet-node.goblank.io",
+    goerli: "https://goerli-node.goblank.io",
 };
 /**
  * CurrencyAmountArray

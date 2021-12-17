@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers";
 import TornadoConfig from "./config";
 const instances = TornadoConfig.deployments.netId1;
 
@@ -31,8 +32,28 @@ export type ComplianceInfo = {
     transactionHash: string;
     timestamp: Date;
     fee: string;
+    feeBN: BigNumber;
     nullifier: string;
   };
+};
+
+/**
+ * getTokenDecimals
+ * 
+ * Obtains the decimal numbers of a pair token
+ * 
+ * @param chainId The note chainId 
+ * @param pair The note pair
+ * @returns The pair token decimals
+ */
+export const getTokenDecimals = (chainId: number, pair: CurrencyAmountPair): number => {
+  if (!(chainId in Networks)) {
+    throw new Error("Chain not supported");
+  }
+
+  return TornadoConfig.deployments[
+    `netId${chainId}` as keyof typeof TornadoConfig.deployments
+  ][pair.currency.toLowerCase() as KnownCurrencies].decimals;
 };
 
 /**
@@ -53,9 +74,9 @@ export const Networks: { [chainId: number]: string } = {
 };
 
 export const Endpoints: { [name in AvailableNetworks]: string } = {
-  'mainnet': 'https://mainnet-node.goblank.io',
-  'goerli': 'https://goerli-node.goblank.io'
-}
+  mainnet: "https://mainnet-node.goblank.io",
+  goerli: "https://goerli-node.goblank.io",
+};
 
 type CurrencyAmountArrayType = {
   [ccy in KnownCurrencies]: CurrencyAmountType[ccy][];

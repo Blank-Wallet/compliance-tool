@@ -4,6 +4,7 @@ import {
   AvailableNetworks,
   ComplianceInfo,
   Endpoints,
+  getTokenDecimals,
   KnownCurrencies,
   Networks,
 } from "./types";
@@ -97,12 +98,12 @@ export const getComplianceInformation = async (
   }
 
   const noteRegex =
-  /tornado-(?<currency>\w+)-(?<amount>[\d.]+)-(?<chainId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g;
+    /tornado-(?<currency>\w+)-(?<amount>[\d.]+)-(?<chainId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g;
   const match = noteRegex.exec(noteString);
   if (!match || !match.groups) {
     throw new Error("The note has invalid format");
   }
-  
+
   const chainId = parseInt(match.groups.chainId);
   if (!(chainId in Networks)) {
     throw new Error("This note is from an invalid network");
@@ -111,7 +112,7 @@ export const getComplianceInformation = async (
   const depositComplianceInfo = {
     deposit: {},
     withdrawal: {},
-    chainId
+    chainId,
   } as ComplianceInfo;
 
   const pair = {
@@ -120,7 +121,7 @@ export const getComplianceInformation = async (
   };
 
   const note = match.groups.note;
-  
+
   const network = Networks[chainId];
   const parsedDeposit = await parseDeposit(note);
 
@@ -209,13 +210,15 @@ export const getComplianceInformation = async (
     to: withdrawEv.to,
     transactionHash: withdrawEv.transactionHash,
     timestamp: new Date(timestamp * 1000),
-    fee: utils.formatEther(BigNumber.from(withdrawEv.fee)),
+    fee: utils.formatUnits(
+      BigNumber.from(withdrawEv.fee),
+      getTokenDecimals(chainId, pair)
+    ),
+    feeBN: BigNumber.from(withdrawEv.fee),
     nullifier: parsedDeposit.nullifierHex,
   };
 
   return depositComplianceInfo;
 };
 
-export {
-  ethers
-};
+export { ethers };

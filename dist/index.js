@@ -127,7 +127,7 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                 depositComplianceInfo = {
                     deposit: {},
                     withdrawal: {},
-                    chainId: chainId
+                    chainId: chainId,
                 };
                 pair = {
                     currency: match.groups.currency,
@@ -190,7 +190,8 @@ var getComplianceInformation = function (noteString) { return __awaiter(void 0, 
                     to: withdrawEv.to,
                     transactionHash: withdrawEv.transactionHash,
                     timestamp: new Date(timestamp * 1000),
-                    fee: ethers_1.utils.formatEther(ethers_1.BigNumber.from(withdrawEv.fee)),
+                    fee: ethers_1.utils.formatUnits(ethers_1.BigNumber.from(withdrawEv.fee), (0, types_1.getTokenDecimals)(chainId, pair)),
+                    feeBN: ethers_1.BigNumber.from(withdrawEv.fee),
                     nullifier: parsedDeposit.nullifierHex,
                 };
                 return [2 /*return*/, depositComplianceInfo];

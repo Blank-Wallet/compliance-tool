@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers";
 declare const instances: {
     eth: {
         instanceAddress: {
@@ -90,9 +91,20 @@ export declare type ComplianceInfo = {
         transactionHash: string;
         timestamp: Date;
         fee: string;
+        feeBN: BigNumber;
         nullifier: string;
     };
 };
+/**
+ * getTokenDecimals
+ *
+ * Obtains the decimal numbers of a pair token
+ *
+ * @param chainId The note chainId
+ * @param pair The note pair
+ * @returns The pair token decimals
+ */
+export declare const getTokenDecimals: (chainId: number, pair: CurrencyAmountPair) => number;
 /**
  * Defines a type that types the currency with the available amount types
  */
