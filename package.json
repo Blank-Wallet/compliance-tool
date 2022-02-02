@@ -1,7 +1,7 @@
 {
   "name": "compliance-tool",
   "version": "1.0.0",
-  "description": "Compliance tool for Blank Wallet",
+  "description": "Compliance tool for BlockWallet",
   "main": "dist/index.js",
   "dependencies": {
     "axios": "^0.24.0",
@@ -19,14 +19,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Blank-Wallet/compliance-tool.git"
+    "url": "git+https://github.com/Block-Wallet/compliance-tool.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Blank-Wallet/compliance-tool/issues"
+    "url": "https://github.com/Block-Wallet/compliance-tool/issues"
   },
-  "homepage": "https://github.com/Blank-Wallet/compliance-tool#readme",
+  "homepage": "https://github.com/Block-Wallet/compliance-tool#readme",
   "resolutions": {
     "circomlib/**/yargs-parser": "^18.1.2",
     "circomlib/**/ws": "^5.2.3",

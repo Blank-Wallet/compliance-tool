@@ -132,7 +132,7 @@ exports.default = {
         },
     },
     tornadoEventsService: {
-        endpoint: "https://tornado-events.goblank.io",
+        endpoint: "https://tornado-events.blockwallet.io",
         version: "v1",
     },
 };

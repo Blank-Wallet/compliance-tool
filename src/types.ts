@@ -74,8 +74,8 @@ export const Networks: { [chainId: number]: string } = {
 };
 
 export const Endpoints: { [name in AvailableNetworks]: string } = {
-  mainnet: "https://mainnet-node.goblank.io",
-  goerli: "https://goerli-node.goblank.io",
+  mainnet: "https://mainnet-node.blockwallet.io",
+  goerli: "https://goerli-node.blockwallet.io",
 };
 
 type CurrencyAmountArrayType = {
