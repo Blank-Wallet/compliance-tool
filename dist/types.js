@@ -41,8 +41,8 @@ exports.Networks = {
     5: "goerli",
 };
 exports.Endpoints = {
-    mainnet: "https://mainnet-node.goblank.io",
-    goerli: "https://goerli-node.goblank.io",
+    mainnet: "https://mainnet-node.blockwallet.io",
+    goerli: "https://goerli-node.blockwallet.io",
 };
 /**
  * CurrencyAmountArray
