@@ -4,7 +4,7 @@ import {
   AvailableNetworks,
   ComplianceInfo,
   Endpoints,
-  getTokenDecimals,
+  getTornadoTokenDecimals,
   KnownCurrencies,
   Networks,
 } from "./types";
@@ -26,6 +26,12 @@ const providers: {
 } = {
   mainnet: undefined,
   goerli: undefined,
+  bsc: undefined,
+  polygon: undefined,
+  arbitrum: undefined,
+  optimism: undefined,
+  avalanchec: undefined,
+  xdai: undefined
 };
 
 const getProvider = (network: AvailableNetworks) => {
@@ -128,9 +134,9 @@ export const getComplianceInformation = async (
   // Init contract
   const networkKey = `netId${chainId}`;
   const { deployments } = config;
-  const contractAddress: string = (deployments as any)[networkKey][
+  const contractAddress: string = (deployments as any)[networkKey].currencies[
     pair.currency
-  ].instanceAddress[pair.amount];
+  ].instances[pair.amount].address;
   const contract = new Contract(
     contractAddress,
     MixerAbi,
@@ -212,7 +218,7 @@ export const getComplianceInformation = async (
     timestamp: new Date(timestamp * 1000),
     fee: utils.formatUnits(
       BigNumber.from(withdrawEv.fee),
-      getTokenDecimals(chainId, pair)
+      getTornadoTokenDecimals(chainId, pair)
     ),
     feeBN: BigNumber.from(withdrawEv.fee),
     nullifier: parsedDeposit.nullifierHex,

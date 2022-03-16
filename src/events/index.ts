@@ -6,6 +6,8 @@ import { EventsUpdateType, TornadoEventsDB } from "./TornadoEventsDB";
 import { TornadoEventsService } from "./TornadoEventsService";
 import config from "../config";
 
+const tornadoDeployments = config.deployments as any;
+
 export enum TornadoEvents {
   DEPOSIT = "Deposit",
   WITHDRAWAL = "Withdrawal",
@@ -37,7 +39,11 @@ export const updateTornadoEvents = async (
     throw new Error("The events db must be initialized first!");
   }
 
-  let fromBlockEvent = 0;
+  let fromBlockEvent =
+    tornadoDeployments[`netId${chainId}`].currencies[
+      currencyAmountPair.currency
+    ].instances[currencyAmountPair.amount].initialBlock;
+
   let fromIndexEvent = 0;
 
   if (!forceUpdate) {

@@ -1,15 +1,5 @@
 import { BigNumber } from "ethers";
 import TornadoConfig from "./config";
-const instances = TornadoConfig.deployments.netId1;
-
-export enum KnownCurrencies {
-  ETH = "eth",
-  DAI = "dai",
-  cDAI = "cdai",
-  USDC = "usdc",
-  USDT = "usdt",
-  WBTC = "wbtc",
-}
 
 export type CurrencyAmountPair = {
   currency: KnownCurrencies;
@@ -39,59 +29,122 @@ export type ComplianceInfo = {
 
 /**
  * getTokenDecimals
- * 
+ *
  * Obtains the decimal numbers of a pair token
- * 
- * @param chainId The note chainId 
+ *
+ * @param chainId The note chainId
  * @param pair The note pair
  * @returns The pair token decimals
  */
-export const getTokenDecimals = (chainId: number, pair: CurrencyAmountPair): number => {
-  if (!(chainId in Networks)) {
-    throw new Error("Chain not supported");
-  }
-
-  return TornadoConfig.deployments[
+export const getTornadoTokenDecimals = (
+  chainId: number,
+  pair: CurrencyAmountPair
+): number => {
+  const currencies = TornadoConfig.deployments[
     `netId${chainId}` as keyof typeof TornadoConfig.deployments
-  ][pair.currency.toLowerCase() as KnownCurrencies].decimals;
+  ].currencies as unknown as { [c in KnownCurrencies]: { decimals: number } };
+  return currencies[pair.currency.toLowerCase() as KnownCurrencies].decimals;
 };
 
 /**
- * Defines a type that types the currency with the available amount types
+ * List of known supported networks
  */
-export type CurrencyAmountType = {
-  [key in KnownCurrencies]: keyof typeof instances[key]["instanceAddress"];
-};
-
 export enum AvailableNetworks {
   MAINNET = "mainnet",
   GOERLI = "goerli",
+  POLYGON = "polygon",
+  BSC = "bsc",
+  xDAI = "xdai",
+  ARBITRUM = "arbitrum",
+  AVALANCHEC = "avalanchec",
+  OPTIMISM = "optimism",
 }
+
+/**
+ * List of known supported currencies
+ */
+export enum KnownCurrencies {
+  ETH = "eth",
+  DAI = "dai",
+  cDAI = "cdai",
+  USDC = "usdc",
+  USDT = "usdt",
+  WBTC = "wbtc",
+  MATIC = "matic",
+  BNB = "bnb",
+  xDAI = "xdai",
+  AVAX = "avax",
+}
+
+/**
+ * List of known native supported currencies
+ */
+export type NativeKnownCurrencies =
+  | KnownCurrencies.ETH
+  | KnownCurrencies.MATIC
+  | KnownCurrencies.AVAX
+  | KnownCurrencies.xDAI
+  | KnownCurrencies.BNB;
+
+/**
+ * List of known ERC20 supported currencies
+ */
+export type ERC20KnownCurrencies = Exclude<
+  KnownCurrencies,
+  NativeKnownCurrencies
+>;
 
 export const Networks: { [chainId: number]: string } = {
   1: "mainnet",
   5: "goerli",
+  56: "bsc",
+  137: "polygon",
+  42161: "arbitrum",
+  10: "optimism",
+  43114: "avalanchec",
+  100: "xdai",
 };
 
 export const Endpoints: { [name in AvailableNetworks]: string } = {
   mainnet: "https://mainnet-node.blockwallet.io",
   goerli: "https://goerli-node.blockwallet.io",
+  bsc: "https://bsc-node.blockwallet.io",
+  polygon: `https://polygon-node.blockwallet.io`,
+  arbitrum: "https://arbitrum-node.blockwallet.io",
+  optimism: "https://optimism-node.blockwallet.io",
+  avalanchec: `https://avax-node.blockwallet.io`,
+  xdai: "https://rpc.gnosischain.com/",
 };
 
-type CurrencyAmountArrayType = {
-  [ccy in KnownCurrencies]: CurrencyAmountType[ccy][];
-};
 /**
- * CurrencyAmountArray
+ * Defines a type that associates each available currency with their respective amount types
  */
-export const CurrencyAmountArray: CurrencyAmountArrayType = Object.keys(
-  instances
-).reduce((pv, cv) => {
-  const currency = cv as KnownCurrencies;
-  if (Object.values(KnownCurrencies).includes(currency)) {
-    pv[currency] = Object.keys(
-      instances[currency].instanceAddress
-    ).sort() as any[];
-  }
-  return pv;
-}, {} as CurrencyAmountArrayType);
+export type CurrencyAmountType = {
+  eth: "0.1" | "1" | "10" | "100";
+  dai: "100" | "1000" | "10000" | "100000";
+  cdai: "5000" | "50000" | "500000" | "5000000";
+  usdc: "100" | "1000";
+  usdt: "100" | "1000";
+  wbtc: "0.1" | "1" | "10";
+  matic: "100" | "1000" | "10000" | "100000";
+  bnb: "0.1" | "1" | "10" | "100";
+  avax: "10" | "100" | "500";
+  xdai: "100" | "1000" | "10000" | "100000";
+};
+
+export const CurrencyAmountArray: {
+  [ccy in KnownCurrencies]: CurrencyAmountType[ccy][];
+} = {
+  eth: ["0.1", "1", "10", "100"],
+  dai: ["100", "1000", "10000", "100000"],
+  cdai: ["5000", "50000", "500000", "5000000"],
+  usdc: ["100", "1000"],
+  usdt: ["100", "1000"],
+  wbtc: ["0.1", "1", "10"],
+  matic: ["100", "1000", "10000", "100000"],
+  bnb: ["0.1", "1", "10", "100"],
+  avax: ["10", "100", "500"],
+  xdai: ["100", "1000", "10000", "100000"],
+};
+
+export type CurrencyAmountArrayType = typeof CurrencyAmountArray;
