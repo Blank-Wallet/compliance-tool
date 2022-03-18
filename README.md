@@ -2,8 +2,8 @@
 
 ### Allows to obtain compliance information out of a deposit note string.
 
-The package create an instance of InstanceDB to store all the Tornado deposits and withdrawal events
-that are queried, which is why it is not currently compatible with node environments.
+The package creates an instance of IndexedDB to store all the Tornado deposits and withdrawal events
+that are queried from the events service or provider, which is why it is not currently compatible with node environments.
 
 How to:
 
