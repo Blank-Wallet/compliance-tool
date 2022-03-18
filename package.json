@@ -1,6 +1,6 @@
 {
   "name": "compliance-tool",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Compliance tool for BlockWallet",
   "main": "dist/index.js",
   "dependencies": {
@@ -8,20 +8,19 @@
     "circomlib": "git+https://github.com/tornadocash/circomlib.git#3b492f9801573eebcfe1b6c584afe8a3beecf2b4",
     "ethers": "^5.4.4",
     "idb": "^6.1.2",
-    "snarkjs": "git+https://github.com/tornadocash/snarkjs.git#869181cfaf7526fe8972073d31655493a04326d5"
-  },
-  "devDependencies": {
+    "snarkjs": "git+https://github.com/tornadocash/snarkjs.git#869181cfaf7526fe8972073d31655493a04326d5",
     "rimraf": "^3.0.2",
     "typescript": "^4.5.2"
   },
   "scripts": {
-    "build": "rimraf ./dist && tsc"
+    "build": "rimraf ./dist && tsc",
+    "postinstall": "yarn build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Block-Wallet/compliance-tool.git"
   },
-  "author": "",
+  "author": "Block-Wallet",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Block-Wallet/compliance-tool/issues"

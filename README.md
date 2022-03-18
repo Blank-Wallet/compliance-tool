@@ -8,7 +8,7 @@ that are queried, which is why it is not currently compatible with node environm
 How to:
 
 ```ts
-    import { isValidNoteString, getComplianceInformation } from "compliance-tool";
+    import { isValidNoteString, getComplianceInformation, initialize } from "compliance-tool";
 
     ...
 
@@ -17,6 +17,14 @@ How to:
 
     // Obtain compliance report
     try {
+        await initialize({
+            rpcs: {
+                ...
+            },
+            tornadoService: {
+                ...
+            }
+        })
         const complianceReport = 
             await getComplianceInformation('tornado-1-eth-1-0x...');
     } catch(error) {

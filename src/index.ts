@@ -3,8 +3,7 @@ import { babyJub, pedersenHash } from "circomlib";
 import {
   AvailableNetworks,
   ComplianceInfo,
-  Endpoints,
-  getTokenDecimals,
+  getTornadoTokenDecimals,
   KnownCurrencies,
   Networks,
 } from "./types";
@@ -12,13 +11,14 @@ import {
 import { BigNumber, Contract, ethers, utils } from "ethers";
 import {
   getTornadoEventsDb,
-  initTornadoEventsDB,
+  initTornadoEventsService,
   isInitialized,
+  ServiceConfig,
   TornadoEvents,
   updateTornadoEvents,
 } from "./events";
 import config from "./config";
-import MixerAbi from "./abi/Mixer.abi.json";
+import MixerAbi from "./abi/Mixer.abi";
 
 // Set provider
 const providers: {
@@ -26,12 +26,34 @@ const providers: {
 } = {
   mainnet: undefined,
   goerli: undefined,
+  bsc: undefined,
+  polygon: undefined,
+  arbitrum: undefined,
+  optimism: undefined,
+  avalanchec: undefined,
+  xdai: undefined
 };
+
+let endpoints: { [name in AvailableNetworks]: string } = {
+  mainnet: '',
+  goerli: '',
+  bsc: '',
+  polygon: '',
+  arbitrum: '',
+  optimism: '',
+  avalanchec: '',
+  xdai: '',
+};
+
+export const initialize = async (opts: {rpcs: typeof endpoints; tornadoService: ServiceConfig}) => {
+    endpoints = opts.rpcs
+    await initTornadoEventsService(opts.tornadoService);
+}
 
 const getProvider = (network: AvailableNetworks) => {
   if (providers[network] === undefined) {
     providers[network] = new ethers.providers.JsonRpcProvider(
-      Endpoints[network]
+      endpoints[network]
     );
   }
 
@@ -94,7 +116,7 @@ export const getComplianceInformation = async (
   noteString: string
 ): Promise<ComplianceInfo> => {
   if (!isInitialized()) {
-    await initTornadoEventsDB();
+    throw new Error('You should initialize the tool first!')
   }
 
   const noteRegex =
@@ -128,9 +150,9 @@ export const getComplianceInformation = async (
   // Init contract
   const networkKey = `netId${chainId}`;
   const { deployments } = config;
-  const contractAddress: string = (deployments as any)[networkKey][
+  const contractAddress: string = (deployments as any)[networkKey].currencies[
     pair.currency
-  ].instanceAddress[pair.amount];
+  ].instances[pair.amount].address;
   const contract = new Contract(
     contractAddress,
     MixerAbi,
@@ -212,7 +234,7 @@ export const getComplianceInformation = async (
     timestamp: new Date(timestamp * 1000),
     fee: utils.formatUnits(
       BigNumber.from(withdrawEv.fee),
-      getTokenDecimals(chainId, pair)
+      getTornadoTokenDecimals(chainId, pair)
     ),
     feeBN: BigNumber.from(withdrawEv.fee),
     nullifier: parsedDeposit.nullifierHex,
