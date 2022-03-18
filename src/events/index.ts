@@ -12,17 +12,26 @@ export enum TornadoEvents {
   DEPOSIT = "Deposit",
   WITHDRAWAL = "Withdrawal",
 }
+export interface ServiceConfig {
+  endpoint: string;
+  version: string;
+}
 
 let _tornadoEventsDb: TornadoEventsDB | undefined = undefined;
-let _tornadoEventsService: TornadoEventsService = new TornadoEventsService({
-  endpoint: config.tornadoEventsService.endpoint,
-  version: config.tornadoEventsService.version,
-});
+let _tornadoEventsService: TornadoEventsService | undefined = undefined;
 
-export const isInitialized = () => _tornadoEventsDb !== undefined;
+export const initTornadoEventsService = async (opts?: ServiceConfig) => {
+  _tornadoEventsService = new TornadoEventsService({
+    endpoint: opts?.endpoint || config.tornadoEventsService.endpoint,
+    version: opts?.version || config.tornadoEventsService.version,
+  });
+  await initTornadoEventsDB()
+}
+
+export const isInitialized = () => _tornadoEventsService !== undefined && _tornadoEventsDb !== undefined;
 export const getTornadoEventsDb = () => _tornadoEventsDb;
 
-export const initTornadoEventsDB = async () => {
+const initTornadoEventsDB = async () => {
   _tornadoEventsDb = new TornadoEventsDB("blank_deposits_events", 1);
   return _tornadoEventsDb.createStoreInstances();
 };
@@ -35,6 +44,10 @@ export const updateTornadoEvents = async (
   contract: Contract,
   forceUpdate = false
 ) => {
+  if(!_tornadoEventsService) {
+    throw new Error("The events service must be initialized first!");
+  }
+
   if (!_tornadoEventsDb) {
     throw new Error("The events db must be initialized first!");
   }
@@ -105,7 +118,7 @@ export const updateTornadoEvents = async (
         eventType,
         network,
         currencyAmountPair,
-        events.at(-1)!.blockNumber
+        events[events.length - 1]!.blockNumber
       ),
     ]) as unknown as Promise<void>;
   }

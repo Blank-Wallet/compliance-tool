@@ -3,7 +3,6 @@ import { babyJub, pedersenHash } from "circomlib";
 import {
   AvailableNetworks,
   ComplianceInfo,
-  Endpoints,
   getTornadoTokenDecimals,
   KnownCurrencies,
   Networks,
@@ -12,8 +11,9 @@ import {
 import { BigNumber, Contract, ethers, utils } from "ethers";
 import {
   getTornadoEventsDb,
-  initTornadoEventsDB,
+  initTornadoEventsService,
   isInitialized,
+  ServiceConfig,
   TornadoEvents,
   updateTornadoEvents,
 } from "./events";
@@ -34,10 +34,26 @@ const providers: {
   xdai: undefined
 };
 
+let endpoints: { [name in AvailableNetworks]: string } = {
+  mainnet: '',
+  goerli: '',
+  bsc: '',
+  polygon: '',
+  arbitrum: '',
+  optimism: '',
+  avalanchec: '',
+  xdai: '',
+};
+
+export const initialize = async (opts: {rpcs: typeof endpoints; tornadoService: ServiceConfig}) => {
+    endpoints = opts.rpcs
+    await initTornadoEventsService(opts.tornadoService);
+}
+
 const getProvider = (network: AvailableNetworks) => {
   if (providers[network] === undefined) {
     providers[network] = new ethers.providers.JsonRpcProvider(
-      Endpoints[network]
+      endpoints[network]
     );
   }
 
@@ -100,7 +116,7 @@ export const getComplianceInformation = async (
   noteString: string
 ): Promise<ComplianceInfo> => {
   if (!isInitialized()) {
-    await initTornadoEventsDB();
+    throw new Error('You should initialize the tool first!')
   }
 
   const noteRegex =

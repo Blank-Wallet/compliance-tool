@@ -105,17 +105,6 @@ export const Networks: { [chainId: number]: string } = {
   100: "xdai",
 };
 
-export const Endpoints: { [name in AvailableNetworks]: string } = {
-  mainnet: "https://mainnet-node.blockwallet.io",
-  goerli: "https://goerli-node.blockwallet.io",
-  bsc: "https://bsc-node.blockwallet.io",
-  polygon: `https://polygon-node.blockwallet.io`,
-  arbitrum: "https://arbitrum-node.blockwallet.io",
-  optimism: "https://optimism-node.blockwallet.io",
-  avalanchec: `https://avax-node.blockwallet.io`,
-  xdai: "https://rpc.gnosischain.com/",
-};
-
 /**
  * Defines a type that associates each available currency with their respective amount types
  */
