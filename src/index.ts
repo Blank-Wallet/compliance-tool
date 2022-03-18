@@ -18,7 +18,7 @@ import {
   updateTornadoEvents,
 } from "./events";
 import config from "./config";
-import MixerAbi from "./abi/Mixer.abi.json";
+import MixerAbi from "./abi/Mixer.abi";
 
 // Set provider
 const providers: {
