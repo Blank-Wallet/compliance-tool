@@ -22,7 +22,7 @@
     "type": "git",
     "url": "git+https://github.com/Block-Wallet/compliance-tool.git"
   },
-  "author": "",
+  "author": "Block-Wallet",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Block-Wallet/compliance-tool/issues"
