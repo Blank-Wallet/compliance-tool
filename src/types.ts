@@ -137,3 +137,37 @@ export const CurrencyAmountArray: {
 };
 
 export type CurrencyAmountArrayType = typeof CurrencyAmountArray;
+
+/**
+ * List of available currencies by chain
+ */
+ export const CurrenciesByChain: {
+  [chain in AvailableNetworks]: KnownCurrencies[];
+} = {
+  polygon: [KnownCurrencies.MATIC],
+  arbitrum: [KnownCurrencies.ETH],
+  optimism: [KnownCurrencies.ETH],
+  avalanchec: [KnownCurrencies.AVAX],
+  bsc: [KnownCurrencies.BNB],
+  xdai: [KnownCurrencies.xDAI],
+  goerli: [
+      KnownCurrencies.ETH,
+      KnownCurrencies.DAI,
+      KnownCurrencies.ETH,
+      KnownCurrencies.DAI,
+      KnownCurrencies.cDAI,
+      KnownCurrencies.USDC,
+      KnownCurrencies.USDT,
+      KnownCurrencies.WBTC,
+  ],
+  mainnet: [
+      KnownCurrencies.ETH,
+      KnownCurrencies.DAI,
+      KnownCurrencies.ETH,
+      KnownCurrencies.DAI,
+      KnownCurrencies.cDAI,
+      KnownCurrencies.USDC,
+      KnownCurrencies.USDT,
+      KnownCurrencies.WBTC,
+  ],
+};

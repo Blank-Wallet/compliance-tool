@@ -8,8 +8,10 @@ import ITornadoEventsDB, {
 } from "./ITornadoEventsDB";
 import {
   AvailableNetworks,
+  CurrenciesByChain,
   CurrencyAmountArray,
   CurrencyAmountPair,
+  KnownCurrencies,
 } from "../types";
 import { StoreNames } from "idb";
 import { TornadoEvents } from "./index";
@@ -276,22 +278,28 @@ export class TornadoEventsDB extends IndexedDB<ITornadoEventsDB> {
     // Create available networks tornado instances tables for deposits and withdrawals events
     for (const network of Object.values(AvailableNetworks)) {
       for (const [currency, amount] of Object.entries(CurrencyAmountArray)) {
-        amount.forEach((v: any) => {
-          const depositName: DepositsEventsDbKey =
-            `deposits-${network}-${currency}-${v}` as DepositsEventsDbKey;
-          const withdrawalName: WithdrawalsEventsDbKey =
-            `withdrawals-${network}-${currency}-${v}` as WithdrawalsEventsDbKey;
-          tables.push({
-            name: depositName,
-            keyPath: "leafIndex",
-            indexes: ["leafIndex", "commitment"],
+        if (
+          CurrenciesByChain[network as AvailableNetworks].includes(
+            currency as KnownCurrencies
+          )
+        ) {
+          amount.forEach((v: any) => {
+            const depositName: DepositsEventsDbKey =
+              `deposits-${network}-${currency}-${v}` as DepositsEventsDbKey;
+            const withdrawalName: WithdrawalsEventsDbKey =
+              `withdrawals-${network}-${currency}-${v}` as WithdrawalsEventsDbKey;
+            tables.push({
+              name: depositName,
+              keyPath: "leafIndex",
+              indexes: ["leafIndex", "commitment"],
+            });
+            tables.push({
+              name: withdrawalName,
+              keyPath: "nullifierHex",
+              indexes: ["nullifierHex"],
+            });
           });
-          tables.push({
-            name: withdrawalName,
-            keyPath: "nullifierHex",
-            indexes: ["nullifierHex"],
-          });
-        });
+        }
       }
     }
 
