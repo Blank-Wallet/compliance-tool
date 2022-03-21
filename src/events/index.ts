@@ -32,7 +32,7 @@ export const isInitialized = () => _tornadoEventsService !== undefined && _torna
 export const getTornadoEventsDb = () => _tornadoEventsDb;
 
 const initTornadoEventsDB = async () => {
-  _tornadoEventsDb = new TornadoEventsDB("blank_deposits_events", 1);
+  _tornadoEventsDb = new TornadoEventsDB("blank_deposits_events", 2);
   return _tornadoEventsDb.createStoreInstances();
 };
 
