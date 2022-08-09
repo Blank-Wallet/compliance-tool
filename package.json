@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "dependencies": {
     "axios": "^0.24.0",
-    "circomlib": "git+https://github.com/tornadocash/circomlib.git#3b492f9801573eebcfe1b6c584afe8a3beecf2b4",
+    "circomlib": "https://github.com/block-wallet/circomlib#v0.0.1",
     "ethers": "^5.4.4",
     "idb": "^6.1.2",
-    "@block-wallet/snarkjs": "https://github.com/block-wallet/snarkjs#v0.1.21",
+    "snarkjs": "https://github.com/block-wallet/snarkjs#v0.1.21",
     "rimraf": "^3.0.2",
     "typescript": "^4.5.2"
   },
