@@ -1,2 +1,2 @@
-declare module 'circomlib';
-declare module 'snarkjs';
+declare module '@block-wallet/circomlib';
+declare module '@block-wallet/snarkjs';

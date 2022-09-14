@@ -1,5 +1,5 @@
-import { bigInt } from "snarkjs";
-import { babyJub, pedersenHash } from "circomlib";
+import { bigInt } from "@block-wallet/snarkjs";
+import { babyJub, pedersenHash } from "@block-wallet/circomlib";
 import {
   AvailableNetworks,
   ComplianceInfo,
